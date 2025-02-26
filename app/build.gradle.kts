@@ -37,6 +37,10 @@ android {
     }
     buildFeatures {
         compose = true
+        viewBinding = true
+    }
+    viewBinding {
+        enable = true
     }
 }
 
@@ -49,6 +53,8 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.navigation.fragment.ktx)
+    implementation(libs.material)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -59,4 +65,7 @@ dependencies {
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.firestore)
     implementation(libs.firebase.analytics)
+    implementation("com.google.firebase:firebase-auth-ktx")
+    implementation ("androidx.constraintlayout:constraintlayout:2.1.4")
+
 }
