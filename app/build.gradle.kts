@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.google.services)
+    id("kotlin-kapt") // נדרש עבור Room
 }
 
 android {
@@ -35,12 +36,14 @@ android {
     kotlinOptions {
         jvmTarget = "11"
     }
+    
     buildFeatures {
         compose = true
-        viewBinding = true
+        viewBinding = true // שמרנו את ההגדרה מה-main
     }
-    viewBinding {
-        enable = true
+
+    kapt {
+        correctErrorTypes = true // הוספנו את זה מהענף feature/room-database
     }
 }
 
@@ -53,8 +56,26 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+
+    // שילוב Navigation ו-Room
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.material)
+    
+    // Firebase
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.firestore)
+    implementation(libs.firebase.analytics)
+    implementation("com.google.firebase:firebase-auth-ktx")
+
+    // Constraint Layout
+    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
+
+    // Room Database (שמרנו מהענף feature/room-database)
+    implementation(libs.androidx.room.runtime)
+    kapt(libs.androidx.room.compiler)
+    implementation(libs.androidx.room.ktx)
+    implementation(libs.androidx.room.common)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -62,10 +83,4 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
-    implementation(platform(libs.firebase.bom))
-    implementation(libs.firebase.firestore)
-    implementation(libs.firebase.analytics)
-    implementation("com.google.firebase:firebase-auth-ktx")
-    implementation ("androidx.constraintlayout:constraintlayout:2.1.4")
-
 }
