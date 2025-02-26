@@ -39,9 +39,7 @@ android {
         compose = true
         viewBinding = true
     }
-    viewBinding {
-        enable = true
-    }
+
 }
 
 dependencies {
