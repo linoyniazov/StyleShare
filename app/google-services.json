@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "443266608187",
+    "project_id": "styleshare-8b293",
+    "storage_bucket": "styleshare-8b293.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:443266608187:android:078874b35baa6cd5e9001e",
+        "android_client_info": {
+          "package_name": "com.example.styleshare"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAbNuXh8kBxjnkba5xtfXMXyFmCCxPppe8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
