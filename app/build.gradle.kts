@@ -45,6 +45,7 @@ android {
     kapt {
         correctErrorTypes = true // הוספנו את זה מהענף feature/room-database
     }
+
 }
 
 dependencies {
