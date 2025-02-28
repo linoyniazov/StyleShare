@@ -2,7 +2,7 @@ package com.example.styleshare.viewmodel
 
 import androidx.lifecycle.*
 import com.example.styleshare.model.entities.Post
-import com.example.styleshare.PostRepository
+import com.example.styleshare.repository.PostRepository
 import kotlinx.coroutines.launch
 
 class PostViewModel(private val repository: PostRepository) : ViewModel() {
