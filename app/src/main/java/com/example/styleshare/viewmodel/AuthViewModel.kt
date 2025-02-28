@@ -1,6 +1,5 @@
 package com.example.styleshare.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.styleshare.repository.AuthRepository
@@ -17,37 +16,45 @@ class AuthViewModel(private val authRepository: AuthRepository) : ViewModel() {
     private val _authError = MutableStateFlow<String?>(null)
     val authError: StateFlow<String?> = _authError
 
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading
+
+    private val _authMessage = MutableStateFlow<String?>(null)
+    val authMessage: StateFlow<String?> = _authMessage
+
     fun register(email: String, password: String) {
-        Log.d("AuthViewModel", "🔄 Calling register() with email: $email")
+        _isLoading.value = true
         viewModelScope.launch {
             val result = authRepository.registerUser(email, password)
             result.onSuccess { user ->
-                Log.d("AuthViewModel", "✅ Register successful: ${user.email}")
                 _authState.value = user
+                _authMessage.value = "Registration successful"
             }.onFailure { exception ->
-                Log.e("AuthViewModel", "❌ Register failed: ${exception.message}")
                 _authError.value = exception.message
+                _authMessage.value = "Registration failed: ${exception.message}"
             }
+            _isLoading.value = false
         }
     }
 
     fun login(email: String, password: String) {
-        Log.d("AuthViewModel", "🔄 Calling login() with email: $email")
+        _isLoading.value = true
         viewModelScope.launch {
             val result = authRepository.loginUser(email, password)
             result.onSuccess { user ->
-                Log.d("AuthViewModel", "✅ Login successful: ${user.email}")
                 _authState.value = user
+                _authMessage.value = "Login successful"
             }.onFailure { exception ->
-                Log.e("AuthViewModel", "❌ Login failed: ${exception.message}")
                 _authError.value = exception.message
+                _authMessage.value = "Login failed: ${exception.message}"
             }
+            _isLoading.value = false
         }
     }
 
     fun logout() {
-        Log.d("AuthViewModel", "🔴 Logging out user")
         authRepository.logoutUser()
         _authState.value = null
+        _authMessage.value = "Logged out successfully"
     }
 }
