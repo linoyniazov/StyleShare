@@ -1,5 +1,20 @@
 <resources>
     <string name="app_name">StyleShare</string>
     <!-- TODO: Remove or change this placeholder text -->
+    <!-- Login Screen -->
+    <string name="login_title">Log in</string>
+    <string name="googleSignInBtn">Continue with Google</string>
+
+    <string name="email">email@domain.com</string>
+    <string name="password">password</string>
+    <string name="loginBtn">Log In</string>
+    <string name="or_divider">or</string>
+<!--    <string name="signUpLink">Don’t have an account? <b>Sign Up</b></string>-->
+    <string name="signUpLink">Don’t have an account? <b>Sign Up</b></string>
+    <string name="terms_text">By clicking continue, you agree to our <b>Terms of Service</b> and <b>Privacy Policy</b></string>
+    <string name="app_logo_desc">StyleShare Logo</string>
+    <string name="google_logo_desc">Google Sign-In Logo</string>
+    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+
 </resources>

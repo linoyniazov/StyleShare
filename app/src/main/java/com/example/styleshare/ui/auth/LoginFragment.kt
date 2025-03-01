@@ -35,7 +35,7 @@ class LoginFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             authViewModel.isLoading.collect { isLoading ->
                 binding.loginButton.isEnabled = !isLoading
-                binding.registerButton.isEnabled = !isLoading
+                binding.registerLink.isEnabled = !isLoading
                 binding.progressBar.isVisible = isLoading
             }
         }
@@ -63,7 +63,7 @@ class LoginFragment : Fragment() {
             }
         }
 
-        binding.registerButton.setOnClickListener {
+        binding.registerLink.setOnClickListener {
             val email = binding.emailEditText.text.toString().trim()
             val password = binding.passwordEditText.text.toString().trim()
 
@@ -76,11 +76,6 @@ class LoginFragment : Fragment() {
                     Toast.LENGTH_SHORT
                 ).show()
             }
-        }
-
-        binding.logoutButton.setOnClickListener {
-            authViewModel.logout()
-            Toast.makeText(requireContext(), "Logged out successfully", Toast.LENGTH_SHORT).show()
         }
     }
 

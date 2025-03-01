@@ -60,7 +60,7 @@ dependencies {
 
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui)
-    implementation(libs.material)
+//    implementation(libs.material)
     
     // Firebase
     implementation(platform(libs.firebase.bom))
@@ -84,4 +84,6 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+   implementation (libs.material)
+
 }
