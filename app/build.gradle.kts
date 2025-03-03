@@ -60,6 +60,8 @@ dependencies {
 
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui)
+    implementation(libs.androidx.navigation.safe.args.gradle.plugin)
+
 
     // Firebase
     implementation(platform(libs.firebase.bom))
@@ -72,6 +74,9 @@ dependencies {
 
     // Room Database
     implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.navigation.ui.ktx)
+    implementation(libs.androidx.activity)
     kapt(libs.androidx.room.compiler)
     implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.room.common)

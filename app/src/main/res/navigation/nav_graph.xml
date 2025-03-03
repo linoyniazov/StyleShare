@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
-             xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
     app:startDestination="@id/loginFragment">
@@ -10,9 +10,30 @@
         android:name="com.example.styleshare.ui.auth.LoginFragment"
         android:label="fragment_login"
         tools:layout="@layout/fragment_login" />
+
     <fragment
-        android:id="@+id/registerFragment"
-        android:name="com.example.styleshare.ui.auth.RegisterFragment"
-        android:label="fragment_register"
-        tools:layout="@layout/fragment_register" />
+        android:id="@+id/registerEmailFragment"
+        android:name="com.example.styleshare.ui.auth.RegisterEmailFragment"
+        android:label="fragment_register_email"
+        tools:layout="@layout/fragment_register_email">
+        <action
+            android:id="@+id/action_registerEmailFragment_to_registerPasswordFragment"
+            app:destination="@id/registerPasswordFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/registerPasswordFragment"
+        android:name="com.example.styleshare.ui.auth.RegisterPasswordFragment"
+        android:label="fragment_register_password"
+        tools:layout="@layout/fragment_register_password">
+        <argument
+            android:name="email"
+            app:argType="string" />
+    </fragment>
+
+<!--    <fragment-->
+<!--        android:id="@+id/homeFragment"-->
+<!--        android:name="com.example.styleshare.ui.home.HomeFragment"-->
+<!--        android:label="fragment_home"-->
+<!--        tools:layout="@layout/fragment_home" />-->
 </navigation>
