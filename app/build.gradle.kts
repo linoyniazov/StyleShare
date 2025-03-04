@@ -3,7 +3,8 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.google.services)
-    id("kotlin-kapt") // נדרש עבור Room
+    alias(libs.plugins.androidx.navigation.safeargs)
+    id("kotlin-kapt")
 }
 
 android {
@@ -36,16 +37,15 @@ android {
     kotlinOptions {
         jvmTarget = "11"
     }
-    
+
     buildFeatures {
         compose = true
-        viewBinding = true // שמרנו את ההגדרה מה-main
+        viewBinding = true
     }
 
     kapt {
-        correctErrorTypes = true // הוספנו את זה מהענף feature/room-database
+        correctErrorTypes = true
     }
-
 }
 
 dependencies {
@@ -58,20 +58,19 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
 
-    // שילוב Navigation ו-Room
     implementation(libs.androidx.navigation.fragment.ktx)
-    implementation(libs.material)
-    
+    implementation(libs.androidx.navigation.ui)
+
     // Firebase
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.firestore)
     implementation(libs.firebase.analytics)
-    implementation("com.google.firebase:firebase-auth-ktx")
+    implementation(libs.firebase.auth.ktx)
 
     // Constraint Layout
-    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
+    implementation(libs.androidx.constraintlayout)
 
-    // Room Database (שמרנו מהענף feature/room-database)
+    // Room Database
     implementation(libs.androidx.room.runtime)
     kapt(libs.androidx.room.compiler)
     implementation(libs.androidx.room.ktx)
@@ -84,4 +83,5 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+    implementation(libs.material)
 }

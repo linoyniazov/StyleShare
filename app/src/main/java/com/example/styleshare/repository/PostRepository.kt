@@ -1,4 +1,5 @@
-package com.example.styleshare
+
+package com.example.styleshare.repository
 
 import androidx.lifecycle.LiveData
 import com.example.styleshare.model.dao.PostDao

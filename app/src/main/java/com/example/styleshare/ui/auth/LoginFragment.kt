@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -19,7 +20,11 @@ class LoginFragment : Fragment() {
     private val binding get() = _binding!!
     private val authViewModel: AuthViewModel by viewModels()
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
         _binding = FragmentLoginBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -27,39 +32,49 @@ class LoginFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        viewLifecycleOwner.lifecycleScope.launch {
+            authViewModel.isLoading.collect { isLoading ->
+                binding.loginButton.isEnabled = !isLoading
+                binding.registerLink.isEnabled = !isLoading
+                binding.progressBar.isVisible = isLoading
+            }
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            authViewModel.authMessage.collect { message ->
+                message?.let { msg ->
+                    Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+
         binding.loginButton.setOnClickListener {
-            val email = binding.emailEditText.text.toString()
-            val password = binding.passwordEditText.text.toString()
+            val email = binding.emailEditText.text.toString().trim()
+            val password = binding.passwordEditText.text.toString().trim()
 
-            Log.d("LoginFragment", "🔄 Login button clicked with email: $email")
-
-            if (email.isNotEmpty() && password.isNotEmpty()) {
+            if (email.isNotEmpty() && password.length >= 6) {
                 authViewModel.login(email, password)
             } else {
-                Toast.makeText(requireContext(), "Please enter both email and password", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    requireContext(),
+                    "Please enter valid email and password",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
 
-        binding.logoutButton.setOnClickListener {
-            Log.d("LoginFragment", "🔴 Logout button clicked")
-            authViewModel.logout()
-            Toast.makeText(requireContext(), "Logged out successfully", Toast.LENGTH_SHORT).show()
-        }
+        binding.registerLink.setOnClickListener {
+            val email = binding.emailEditText.text.toString().trim()
+            val password = binding.passwordEditText.text.toString().trim()
 
-        viewLifecycleOwner.lifecycleScope.launch {
-            authViewModel.authState.collect { user ->
-                user?.let {
-                    Toast.makeText(requireContext(), "Login Successful!", Toast.LENGTH_SHORT).show()
-                    // TODO: Handle post-login UI updates (without navigation for now)
-                }
-            }
-        }
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            authViewModel.authError.collect { error ->
-                error?.let {
-                    Toast.makeText(requireContext(), "Login Failed: $it", Toast.LENGTH_SHORT).show()
-                }
+            if (email.isNotEmpty() && password.length >= 6) {
+                authViewModel.register(email, password)
+            } else {
+                Toast.makeText(
+                    requireContext(),
+                    "Please enter a valid email and password",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
     }

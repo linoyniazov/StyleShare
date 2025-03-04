@@ -1,6 +1,10 @@
 package com.example.styleshare
 
+import android.content.Intent
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -17,62 +21,19 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 
-class MainActivity : ComponentActivity() {
-    private val db: FirebaseFirestore by lazy { Firebase.firestore } // Firestore Instance
+class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        setContent {
-            StyleShareTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    FirestoreTestScreen(
-                        db = db,
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
-            }
+        setContentView(R.layout.activity_main)
+
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            insets
         }
-    }
-}
 
-@Composable
-fun FirestoreTestScreen(db: FirebaseFirestore, modifier: Modifier = Modifier) {
-    var message by remember { mutableStateOf("Fetching Firestore data...") }
-
-    LaunchedEffect(Unit) {
-        val testUser = hashMapOf(
-            "name" to "John Doe",
-            "email" to "john@example.com"
-        )
-
-        db.collection("users").document("testUser")
-            .set(testUser)
-            .addOnSuccessListener {
-                message = "Firestore Connected: User added!"
-                Log.d("Firestore", "User added successfully!")
-            }
-            .addOnFailureListener { e ->
-                message = "Error connecting to Firestore"
-                Log.e("Firestore", "Error adding user", e)
-            }
-    }
-
-    Box(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(text = message, style = MaterialTheme.typography.headlineMedium)
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun FirestoreTestScreenPreview() {
-    StyleShareTheme {
-        FirestoreTestScreen(Firebase.firestore)
     }
 }

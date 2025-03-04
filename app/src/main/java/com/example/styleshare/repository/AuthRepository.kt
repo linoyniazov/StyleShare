@@ -15,16 +15,17 @@ class AuthRepository {
     }
 
     suspend fun registerUser(email: String, password: String): Result<FirebaseUser> {
-        Log.d("AuthRepository", "🔄 registerUser() called with email: $email")
+        if (password.length < 6) {
+            return Result.failure(Exception("Password must be at least 6 characters"))
+        }
         return try {
             val result = firebaseAuth.createUserWithEmailAndPassword(email, password).await()
-            Log.d("AuthRepository", "✅ User registered: ${result.user?.email}")
             Result.success(result.user!!)
         } catch (e: Exception) {
-            Log.e("AuthRepository", "❌ Registration failed: ${e.message}", e)
-            Result.failure(e)
+            Result.failure(Exception("Registration failed. Please check your email and try again."))
         }
     }
+
 
     suspend fun loginUser(email: String, password: String): Result<FirebaseUser> {
         Log.d("AuthRepository", "🔄 loginUser() called with email: $email")
