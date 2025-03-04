@@ -27,6 +27,7 @@
     <string name="password_title">Create a password</string>
     <string name="password_subtitle">Choose a strong password for your account</string>
     <string name="registerBtn">Sign Up</string>
+    <string name="confirm_password">Confirm Password</string>
 
     <!--    welcome Screen-->
     <string name="welcome_title">Welcome to StyleShare</string>
