@@ -1,18 +1,61 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
-             xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/nav_graph"
-    app:startDestination="@id/loginFragment">
+    app:startDestination="@id/welcomeFragment">
 
+    <!-- Welcome Screen -->
+    <fragment
+        android:id="@+id/welcomeFragment"
+        android:name="com.example.styleshare.WelcomeFragment"
+        android:label="Welcome"
+        tools:layout="@layout/fragment_welcome">
+        <action
+            android:id="@+id/action_welcomeFragment_to_loginFragment"
+            app:destination="@id/loginFragment"/>
+        <action
+            android:id="@+id/action_welcomeFragment_to_registerEmailFragment"
+            app:destination="@id/registerEmailFragment"/>
+    </fragment>
+
+    <!-- Login Screen -->
     <fragment
         android:id="@+id/loginFragment"
         android:name="com.example.styleshare.ui.auth.LoginFragment"
-        android:label="fragment_login"
-        tools:layout="@layout/fragment_login" />
+        android:label="Login"
+        tools:layout="@layout/fragment_login">
+        <action
+            android:id="@+id/action_loginFragment_to_registerEmailFragment"
+            app:destination="@id/registerEmailFragment"/>
+    </fragment>
+
+    <!-- Register Email Screen -->
     <fragment
-        android:id="@+id/registerFragment"
-        android:name="com.example.styleshare.ui.auth.RegisterFragment"
-        android:label="fragment_register"
-        tools:layout="@layout/fragment_register" />
+        android:id="@+id/registerEmailFragment"
+        android:name="com.example.styleshare.ui.auth.RegisterEmailFragment"
+        android:label="Register Email"
+        tools:layout="@layout/fragment_register_email">
+        <action
+            android:id="@+id/action_registerEmailFragment_to_registerPasswordFragment"
+            app:destination="@id/registerPasswordFragment">
+            <argument
+                android:name="email"
+                app:argType="string"/>
+        </action>
+        <action
+            android:id="@+id/action_registerEmailFragment_to_loginFragment"
+            app:destination="@id/loginFragment"/>
+    </fragment>
+
+    <!-- Register Password Screen (No homeFragment) -->
+    <fragment
+        android:id="@+id/registerPasswordFragment"
+        android:name="com.example.styleshare.ui.auth.RegisterPasswordFragment"
+        android:label="Register Password"
+        tools:layout="@layout/fragment_register_password">
+        <argument
+            android:name="email"
+            app:argType="string"/>
+    </fragment>
+
 </navigation>
