@@ -24,8 +24,17 @@
     <string name="error_empty_email">Please enter an email address</string>
     <string name="registration_success">Registration Successful!</string>
     <string name="error_message">Error: %s</string>
+    <string name="password_title">Create a password</string>
+    <string name="password_subtitle">Choose a strong password for your account</string>
+    <string name="registerBtn">Sign Up</string>
+
+    <!--    welcome Screen-->
+    <string name="welcome_title">Welcome to StyleShare</string>
+    <string name="welcome_subtitle">Discover and share your favorite looks!</string>
+    <string name="welcome_image_desc">Welcome screen background</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+
 
 </resources>
