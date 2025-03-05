@@ -4,16 +4,26 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
+import com.example.styleshare.model.converters.Converters
+import com.example.styleshare.model.dao.CommentDao
 import com.example.styleshare.model.dao.PostDao
 import com.example.styleshare.model.dao.UserDao
+import com.example.styleshare.model.entities.Comment
 import com.example.styleshare.model.entities.Post
 import com.example.styleshare.model.entities.User
 
-@Database(entities = [User::class, Post::class], version = 2, exportSchema = false)
+@Database(
+    entities = [User::class, Post::class, Comment::class],
+    version = 5,
+    exportSchema = false
+)
+@TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun userDao(): UserDao
     abstract fun postDao(): PostDao
+    abstract fun commentDao(): CommentDao
 
     companion object {
         @Volatile
@@ -25,7 +35,9 @@ abstract class AppDatabase : RoomDatabase() {
                     context.applicationContext,
                     AppDatabase::class.java,
                     "styleshare_database"
-                ).fallbackToDestructiveMigration().build()
+                )
+                    .fallbackToDestructiveMigration()
+                    .build()
                 INSTANCE = instance
                 instance
             }

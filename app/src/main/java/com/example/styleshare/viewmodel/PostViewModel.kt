@@ -1,33 +1,93 @@
+
 package com.example.styleshare.viewmodel
 
-import androidx.lifecycle.*
+import android.app.Application
+import android.content.Context
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
+import com.example.styleshare.model.AppDatabase
 import com.example.styleshare.model.entities.Post
 import com.example.styleshare.repository.PostRepository
+import com.example.styleshare.utils.CloudinaryManager
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.io.File
 
-class PostViewModel(private val repository: PostRepository) : ViewModel() {
+class PostViewModel(private val repository: PostRepository, context: Context) : ViewModel() {
 
-    fun insertPost(post: Post) = viewModelScope.launch {
+    val allPosts: LiveData<List<Post>> = repository.getAllPosts()
+    private val cloudinaryManager = CloudinaryManager(context)
+    private val _uploadResult = MutableLiveData<String?>()
+    val uploadResult: LiveData<String?> get() = _uploadResult
+
+    fun insertPost(post: Post) = viewModelScope.launch(Dispatchers.IO) {
         repository.insertPost(post)
-    }
-
-    fun getAllPosts(): LiveData<List<Post>> {
-        return repository.getAllPosts()
     }
 
     fun getPostsByUser(userId: String): LiveData<List<Post>> {
         return repository.getPostsByUser(userId)
     }
 
-    fun getPostById(postId: Int): LiveData<Post> {
+    fun getPostById(postId: String): LiveData<Post> {
         return repository.getPostById(postId)
     }
 
-    fun updatePostCaption(postId: Int, caption: String) = viewModelScope.launch {
-        repository.updatePostCaption(postId, caption)
+    fun updatePost(
+        postId: String,
+        caption: String,
+        category: String,
+        editedTimestamp: Long = System.currentTimeMillis()
+    ) = viewModelScope.launch(Dispatchers.IO) {
+        repository.updatePost(postId, caption, category, editedTimestamp)
     }
 
-    fun deletePost(postId: Int) = viewModelScope.launch {
+    fun updateLikes(postId: String, increment: Int) = viewModelScope.launch(Dispatchers.IO) {
+        repository.updateLikes(postId, increment)
+    }
+
+    fun updateCommentsCount(postId: String, increment: Int) = viewModelScope.launch(Dispatchers.IO) {
+        repository.updateCommentsCount(postId, increment)
+    }
+
+    fun deletePost(postId: String) = viewModelScope.launch(Dispatchers.IO) {
         repository.deletePost(postId)
     }
+
+    fun deletePostWithImage(postId: String, cloudinaryPublicId: String) = viewModelScope.launch(Dispatchers.IO) {
+        if (cloudinaryPublicId.isNotEmpty()) {
+            cloudinaryManager.deleteImage(cloudinaryPublicId)
+        }
+        repository.deletePost(postId)
+    }
+
+    // פונקציה להעלאת תמונה ל-Cloudinary ושמירת הקישור בפוסט
+    fun uploadImageAndCreatePost(imageFile: File, post: Post) = viewModelScope.launch(Dispatchers.IO) {
+        val uploadedImageUrl = cloudinaryManager.uploadImage(imageFile.absolutePath)
+        if (uploadedImageUrl != null) {
+            val postWithImage = post.copy(imageUrl = uploadedImageUrl)
+            repository.insertPost(postWithImage)
+            _uploadResult.postValue(uploadedImageUrl)
+        } else {
+            _uploadResult.postValue(null) // העלאה נכשלה
+        }
+    }
+
+    class PostViewModelFactory(private val repository: PostRepository, private val context: Context) : ViewModelProvider.Factory {
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            if (modelClass.isAssignableFrom(PostViewModel::class.java)) {
+                @Suppress("UNCHECKED_CAST")
+                return PostViewModel(repository, context) as T
+            }
+            throw IllegalArgumentException("Unknown ViewModel class")
+        }
+    }
+}
+
+fun createPostViewModel(application: Application): PostViewModel {
+    val database = AppDatabase.getDatabase(application)
+    val repository = PostRepository(database.postDao()) // ✅ Correct
+    return PostViewModel(repository, application.applicationContext)
 }

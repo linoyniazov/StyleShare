@@ -19,15 +19,28 @@ class PostRepository(private val postDao: PostDao) {
         return postDao.getPostsByUser(userId)
     }
 
-    fun getPostById(postId: Int): LiveData<Post> {
+    fun getPostById(postId: String): LiveData<Post> {
         return postDao.getPostById(postId)
     }
 
-    suspend fun updatePostCaption(postId: Int, caption: String) {
-        postDao.updatePostCaption(postId, caption)
+    suspend fun updatePost(
+        postId: String,
+        caption: String,
+        category: String,
+        editedTimestamp: Long = System.currentTimeMillis()
+    ) {
+        postDao.updatePost(postId, caption, category, editedTimestamp)
     }
 
-    suspend fun deletePost(postId: Int) {
+    suspend fun updateLikes(postId: String, increment: Int) {
+        postDao.updateLikes(postId, increment)
+    }
+
+    suspend fun updateCommentsCount(postId: String, increment: Int) {
+        postDao.updateCommentsCount(postId, increment)
+    }
+
+    suspend fun deletePost(postId: String) {
         postDao.deletePost(postId)
     }
 }
