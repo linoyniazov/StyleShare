@@ -7,7 +7,6 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.example.styleshare.model.entities.Post
 
-
 @Dao
 interface PostDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -20,11 +19,29 @@ interface PostDao {
     fun getPostsByUser(userId: String): LiveData<List<Post>>
 
     @Query("SELECT * FROM posts WHERE postId = :postId")
-    fun getPostById(postId: Int): LiveData<Post>  // Changed String to Int
+    fun getPostById(postId: String): LiveData<Post>
 
-    @Query("UPDATE posts SET caption = :caption WHERE postId = :postId")
-    suspend fun updatePostCaption(postId: Int, caption: String) // Renamed 'content' to 'caption'
+    @Query("""
+        UPDATE posts
+        SET caption = :caption,
+            edited = true,
+            editedTimestamp = :editedTimestamp,
+            category = :category
+        WHERE postId = :postId
+    """)
+    suspend fun updatePost(
+        postId: String,
+        caption: String,
+        category: String,
+        editedTimestamp: Long = System.currentTimeMillis()
+    )
+
+    @Query("UPDATE posts SET likes = likes + :increment WHERE postId = :postId")
+    suspend fun updateLikes(postId: String, increment: Int)
+
+    @Query("UPDATE posts SET commentsCount = commentsCount + :increment WHERE postId = :postId")
+    suspend fun updateCommentsCount(postId: String, increment: Int)
 
     @Query("DELETE FROM posts WHERE postId = :postId")
-    suspend fun deletePost(postId: Int) // Changed String to Int
+    suspend fun deletePost(postId: String)
 }

@@ -1,4 +1,4 @@
-// Post.kt
+// Comment.kt
 package com.example.styleshare.model.entities
 
 import androidx.room.Entity
@@ -7,8 +7,14 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 
 @Entity(
-    tableName = "posts",
+    tableName = "comments",
     foreignKeys = [
+        ForeignKey(
+            entity = Post::class,
+            parentColumns = ["postId"],
+            childColumns = ["postId"],
+            onDelete = ForeignKey.CASCADE
+        ),
         ForeignKey(
             entity = User::class,
             parentColumns = ["userId"],
@@ -17,21 +23,16 @@ import androidx.room.PrimaryKey
         )
     ],
     indices = [
+        Index("postId"),
         Index("userId")
     ]
 )
-data class Post(
-    @PrimaryKey val postId: String,
+data class Comment(
+    @PrimaryKey(autoGenerate = true) val commentId: Long = 0,
+    val postId: String,
     val userId: String,
-    val imageUrl: String,
-    val caption: String,
-    val category: String,
+    val content: String,
     val timestamp: Long,
-    val likes: Int = 0,
-    val commentsCount: Int = 0,
-    val imageWidth: Int? = null,
-    val imageHeight: Int? = null,
     val edited: Boolean = false,
-    val editedTimestamp: Long? = null,
-    val items: List<String> = listOf()
-    )
+    val editedTimestamp: Long? = null
+)

@@ -34,6 +34,22 @@
     <string name="welcome_subtitle">Discover and share your favorite looks!</string>
     <string name="welcome_image_desc">Welcome screen background</string>
 
+    <!-- upload post -->
+    <string name="upload_post_title">Upload Post</string>
+    <string name="upload_post_hint">Write a caption about your look…</string>
+    <string name="upload_post_category">Category</string>
+    <string name="upload_post_casual">Casual</string>
+    <string name="upload_post_elegant">Elegant</string>
+    <string name="upload_post_party">Party</string>
+    <string name="upload_post_formal">Formal</string>
+    <string name="upload_post_evening">Evening</string>
+    <string name="upload_post_other">Other</string>
+    <string name="upload_post_upload">Upload</string>
+    <string name="upload_post_error">Error: %s</string>
+    <string name="Items">Items</string>
+    <string name="add_item">Add More Item</string>
+    <string name="New_post">New post</string>
+
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
