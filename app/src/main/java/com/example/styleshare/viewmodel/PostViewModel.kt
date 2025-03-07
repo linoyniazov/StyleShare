@@ -1,28 +1,15 @@
-
 package com.example.styleshare.viewmodel
 
-import android.app.Application
-import android.content.Context
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewModelScope
-import com.example.styleshare.model.AppDatabase
+import androidx.lifecycle.*
 import com.example.styleshare.model.entities.Post
 import com.example.styleshare.repository.PostRepository
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.io.File
 
-class PostViewModel(private val repository: PostRepository, context: Context) : ViewModel() {
+class PostViewModel(private val repository: PostRepository) : ViewModel() {
 
     val allPosts: LiveData<List<Post>> = repository.getAllPosts()
 
-    private val _uploadResult = MutableLiveData<String?>()
-    val uploadResult: LiveData<String?> get() = _uploadResult
-
-    fun insertPost(post: Post) = viewModelScope.launch(Dispatchers.IO) {
+    fun insertPost(post: Post) = viewModelScope.launch {
         repository.insertPost(post)
     }
 
@@ -34,46 +21,30 @@ class PostViewModel(private val repository: PostRepository, context: Context) : 
         return repository.getPostById(postId)
     }
 
-    fun updatePost(
-        postId: String,
-        caption: String,
-        category: String,
-        editedTimestamp: Long = System.currentTimeMillis()
-    ) = viewModelScope.launch(Dispatchers.IO) {
-        repository.updatePost(postId, caption, category, editedTimestamp)
+    fun updatePost(postId: String, caption: String, category: String) = viewModelScope.launch {
+        repository.updatePost(postId, caption, category)
     }
 
-    fun updateLikes(postId: String, increment: Int) = viewModelScope.launch(Dispatchers.IO) {
+    fun updateLikes(postId: String, increment: Int) = viewModelScope.launch {
         repository.updateLikes(postId, increment)
     }
 
-    fun updateCommentsCount(postId: String, increment: Int) = viewModelScope.launch(Dispatchers.IO) {
+    fun updateCommentsCount(postId: String, increment: Int) = viewModelScope.launch {
         repository.updateCommentsCount(postId, increment)
     }
 
-    fun deletePost(postId: String) = viewModelScope.launch(Dispatchers.IO) {
+    fun deletePost(postId: String) = viewModelScope.launch {
         repository.deletePost(postId)
     }
 
-    fun deletePostWithImage(postId: String, cloudinaryPublicId: String) = viewModelScope.launch(Dispatchers.IO) {
-
-        repository.deletePost(postId)
-    }
-
-
-    class PostViewModelFactory(private val repository: PostRepository, private val context: Context) : ViewModelProvider.Factory {
+    /** ✅ תיקון ה- Factory כך שלא יעביר Context ל- ViewModel **/
+    class PostViewModelFactory(private val repository: PostRepository) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             if (modelClass.isAssignableFrom(PostViewModel::class.java)) {
                 @Suppress("UNCHECKED_CAST")
-                return PostViewModel(repository, context) as T
+                return PostViewModel(repository) as T
             }
             throw IllegalArgumentException("Unknown ViewModel class")
         }
     }
-}
-
-fun createPostViewModel(application: Application): PostViewModel {
-    val database = AppDatabase.getDatabase(application)
-    val repository = PostRepository(database.postDao()) // ✅ Correct
-    return PostViewModel(repository, application.applicationContext)
 }

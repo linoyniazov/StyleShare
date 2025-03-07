@@ -1,11 +1,10 @@
-// Post.kt
 package com.example.styleshare.model.entities
-
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
-
+import androidx.room.TypeConverters
+import com.example.styleshare.utils.Converters
 @Entity(
     tableName = "posts",
     foreignKeys = [
@@ -16,10 +15,9 @@ import androidx.room.PrimaryKey
             onDelete = ForeignKey.CASCADE
         )
     ],
-    indices = [
-        Index("userId")
-    ]
+    indices = [Index("userId")]
 )
+@TypeConverters(Converters::class) // שימוש בקונברטר ל- Room עבור רשימת items
 data class Post(
     @PrimaryKey val postId: String,
     val userId: String,
@@ -33,5 +31,8 @@ data class Post(
     val imageHeight: Int? = null,
     val edited: Boolean = false,
     val editedTimestamp: Long? = null,
-    val items: List<String> = listOf()
-    )
+    val isDraft: Boolean = false, // ✅ שדה חדש - מאפשר שמירה כטיוטה
+    val items: List<String> = listOf(), // ✅ נשמר כרשימה באמצעות TypeConverter
+    val likedBy: List<String> = listOf() // ✅ רשימת משתמשים שלחצו על לייק
+
+)

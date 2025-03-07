@@ -2,7 +2,7 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    app:startDestination="@id/welcomeFragment">
+    app:startDestination="@id/uploadPostFragment">
 
     <!-- Welcome Screen -->
     <fragment
@@ -57,5 +57,11 @@
             android:name="email"
             app:argType="string"/>
     </fragment>
+    <fragment
+        android:id="@+id/uploadPostFragment"
+        android:name="com.example.styleshare.ui.post.UploadPostFragment"
+        android:label="Upload Post"
+        tools:layout="@layout/fragment_upload_post"/>
+
 
 </navigation>
