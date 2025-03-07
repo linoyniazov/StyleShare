@@ -92,4 +92,6 @@ dependencies {
 
     implementation (libs.gson)
 
+    //cloudinary
+    implementation (libs.cloudinary.android)
 }
