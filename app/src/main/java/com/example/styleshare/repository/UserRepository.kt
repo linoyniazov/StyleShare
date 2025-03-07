@@ -24,10 +24,9 @@ class UserRepository(private val userDao: UserDao) {
         email: String,
         fullName: String,
         profileImageUrl: String,
-        profileImageCloudinaryId: String,
         bio: String,
-        followersCount: Int,
-        followingCount: Int,
+        followersCount: String,
+        followingCount: String,
         postsCount: Int
     ) {
         userDao.updateUser(
@@ -36,11 +35,10 @@ class UserRepository(private val userDao: UserDao) {
             email,
             fullName,
             profileImageUrl,
-            profileImageCloudinaryId,
             bio,
             followersCount,
             followingCount,
-            postsCount
+            postsCount,
         )
     }
 

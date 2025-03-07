@@ -24,7 +24,6 @@ data class Post(
     @PrimaryKey val postId: String,
     val userId: String,
     val imageUrl: String,
-    val cloudinaryPublicId: String,
     val caption: String,
     val category: String,
     val timestamp: Long,

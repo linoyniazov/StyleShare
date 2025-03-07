@@ -5,7 +5,7 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import com.example.styleshare.model.converters.Converters
+import com.example.styleshare.utils.Converters
 import com.example.styleshare.model.dao.CommentDao
 import com.example.styleshare.model.dao.PostDao
 import com.example.styleshare.model.dao.UserDao

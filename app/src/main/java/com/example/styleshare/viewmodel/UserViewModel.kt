@@ -47,10 +47,9 @@ class UserViewModel(private val repository: UserRepository) : ViewModel() {
         email: String,
         fullName: String,
         profileImageUrl: String,
-        profileImageCloudinaryId: String,
         bio: String,
-        followersCount: Int,
-        followingCount: Int,
+        followersCount: String,
+        followingCount: String,
         postsCount: Int
     ) = viewModelScope.launch(Dispatchers.IO) {
         repository.updateUser(
@@ -59,7 +58,6 @@ class UserViewModel(private val repository: UserRepository) : ViewModel() {
             email,
             fullName,
             profileImageUrl,
-            profileImageCloudinaryId,
             bio,
             followersCount,
             followingCount,

@@ -24,7 +24,6 @@ interface UserDao {
             email = :email,
             fullName = :fullName,
             profileImageUrl = :profileImageUrl,
-            profileImageCloudinaryId = :profileImageCloudinaryId,
             bio = :bio,
             followersCount = :followersCount,
             followingCount = :followingCount,
@@ -37,10 +36,9 @@ interface UserDao {
         email: String,
         fullName: String,
         profileImageUrl: String,
-        profileImageCloudinaryId: String,
         bio: String,
-        followersCount: Int,
-        followingCount: Int,
+        followersCount: String,
+        followingCount: String,
         postsCount: Int
     )
 

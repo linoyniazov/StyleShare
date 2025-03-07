@@ -11,7 +11,6 @@ import androidx.lifecycle.viewModelScope
 import com.example.styleshare.model.AppDatabase
 import com.example.styleshare.model.entities.Post
 import com.example.styleshare.repository.PostRepository
-import com.example.styleshare.utils.CloudinaryManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.File
@@ -19,7 +18,7 @@ import java.io.File
 class PostViewModel(private val repository: PostRepository, context: Context) : ViewModel() {
 
     val allPosts: LiveData<List<Post>> = repository.getAllPosts()
-    private val cloudinaryManager = CloudinaryManager(context)
+
     private val _uploadResult = MutableLiveData<String?>()
     val uploadResult: LiveData<String?> get() = _uploadResult
 
@@ -57,23 +56,10 @@ class PostViewModel(private val repository: PostRepository, context: Context) : 
     }
 
     fun deletePostWithImage(postId: String, cloudinaryPublicId: String) = viewModelScope.launch(Dispatchers.IO) {
-        if (cloudinaryPublicId.isNotEmpty()) {
-            cloudinaryManager.deleteImage(cloudinaryPublicId)
-        }
+
         repository.deletePost(postId)
     }
 
-    // פונקציה להעלאת תמונה ל-Cloudinary ושמירת הקישור בפוסט
-    fun uploadImageAndCreatePost(imageFile: File, post: Post) = viewModelScope.launch(Dispatchers.IO) {
-        val uploadedImageUrl = cloudinaryManager.uploadImage(imageFile.absolutePath)
-        if (uploadedImageUrl != null) {
-            val postWithImage = post.copy(imageUrl = uploadedImageUrl)
-            repository.insertPost(postWithImage)
-            _uploadResult.postValue(uploadedImageUrl)
-        } else {
-            _uploadResult.postValue(null) // העלאה נכשלה
-        }
-    }
 
     class PostViewModelFactory(private val repository: PostRepository, private val context: Context) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {

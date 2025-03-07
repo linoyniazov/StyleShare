@@ -1,4 +1,4 @@
-package com.example.styleshare.model.converters
+package com.example.styleshare.utils
 
 import androidx.room.TypeConverter
 import com.google.gson.Gson

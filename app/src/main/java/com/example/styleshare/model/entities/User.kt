@@ -11,7 +11,6 @@ data class User(
     val email: String,
     val fullName: String,
     val profileImageUrl: String,
-    val profileImageCloudinaryId: String,
     val bio: String,
     val followersCount: Int = 0,
     val followingCount: Int = 0,
