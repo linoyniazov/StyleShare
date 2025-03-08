@@ -6,8 +6,13 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.styleshare.databinding.FragmentWelcomeBinding
+import com.example.styleshare.ui.BaseFragment
 
-class WelcomeFragment : Fragment() {
+class WelcomeFragment : BaseFragment() {
+
+    override val showToolbar: Boolean = false
+    override val showBottomNav: Boolean = false
+
     private var _binding: FragmentWelcomeBinding? = null
     private val binding get() = _binding!!
 
