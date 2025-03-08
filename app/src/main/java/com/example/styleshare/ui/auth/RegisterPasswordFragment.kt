@@ -9,9 +9,15 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.example.styleshare.databinding.FragmentRegisterPasswordBinding
+import com.example.styleshare.ui.BaseFragment
 import com.google.firebase.auth.FirebaseAuth
 
-class RegisterPasswordFragment : Fragment() {
+class RegisterPasswordFragment : BaseFragment() {
+
+    override val showToolbar: Boolean = true
+    override val showBottomNav: Boolean = false
+    override val showBackButton: Boolean = true
+
 
     private var _binding: FragmentRegisterPasswordBinding? = null
     private val binding get() = _binding!!

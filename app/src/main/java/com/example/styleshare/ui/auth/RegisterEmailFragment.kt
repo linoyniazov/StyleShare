@@ -9,8 +9,13 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.styleshare.databinding.FragmentRegisterEmailBinding
+import com.example.styleshare.ui.BaseFragment
 
-class RegisterEmailFragment : Fragment() {
+class RegisterEmailFragment : BaseFragment() {
+
+    override val showToolbar: Boolean = true
+    override val showBottomNav: Boolean = false
+    override val showBackButton: Boolean = true
 
     private var _binding: FragmentRegisterEmailBinding? = null
     private val binding get() = _binding!!

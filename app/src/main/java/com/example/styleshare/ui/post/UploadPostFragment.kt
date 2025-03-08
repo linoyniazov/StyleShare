@@ -21,11 +21,14 @@ import com.example.styleshare.model.AppDatabase
 import com.example.styleshare.model.CloudinaryModel
 import com.example.styleshare.model.entities.Post
 import com.example.styleshare.repository.PostRepository
+import com.example.styleshare.ui.BaseFragment
 import com.example.styleshare.viewmodel.PostViewModel
 import kotlinx.coroutines.launch
 import java.util.*
 
-class UploadPostFragment : Fragment() {
+class UploadPostFragment : BaseFragment() {
+    override val showToolbar: Boolean = false
+    override val showBottomNav: Boolean = false
 
     private var _binding: FragmentUploadPostBinding? = null
     private val binding get() = _binding!!

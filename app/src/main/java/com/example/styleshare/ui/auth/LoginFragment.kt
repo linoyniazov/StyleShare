@@ -8,9 +8,15 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.styleshare.databinding.FragmentLoginBinding
+import com.example.styleshare.ui.BaseFragment
 import com.google.firebase.auth.FirebaseAuth
 
-class LoginFragment : Fragment() {
+class LoginFragment : BaseFragment() {
+
+    override val showToolbar: Boolean = true
+    override val showBottomNav: Boolean = false
+    override val showBackButton: Boolean = true
+
 
     private var _binding: FragmentLoginBinding? = null
     private val binding get() = _binding!!
