@@ -25,6 +25,7 @@ import com.example.styleshare.repository.PostRepository
 import com.example.styleshare.ui.BaseFragment
 import com.example.styleshare.viewmodel.PostViewModel
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.chip.Chip
 import com.google.android.material.textfield.TextInputEditText
 import kotlinx.coroutines.launch
 import java.util.*
@@ -45,6 +46,8 @@ class UploadPostFragment : BaseFragment() {
     private var imageBitmap: Bitmap? = null
     private var itemCount = 0
     private val itemViews = mutableListOf<View>()
+    private var customCategoryChip: Chip? = null
+    private var isEditingCategory = false
 
     private val pickImageLauncher =
         registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
@@ -81,6 +84,7 @@ class UploadPostFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         setupChipGroupListeners()
+        setupCustomCategoryHandlers()
 
         binding.postImage.setOnClickListener {
             showImagePickerOptions()
@@ -101,8 +105,82 @@ class UploadPostFragment : BaseFragment() {
 
     private fun setupChipGroupListeners() {
         binding.chipOther.setOnCheckedChangeListener { _, isChecked ->
-            binding.otherCategoryInput.visibility = if (isChecked) View.VISIBLE else View.GONE
+            if (isChecked && !isEditingCategory) {
+                showCustomCategoryInput()
+            }
         }
+
+        // Add listeners for all other chips
+        val chips = listOf(
+            binding.chipCasual,
+            binding.chipElegant,
+            binding.chipParty,
+            binding.chipFormal,
+            binding.chipEvening
+        )
+
+        chips.forEach { chip ->
+            chip.setOnCheckedChangeListener { _, isChecked ->
+                if (isChecked) {
+                    hideCustomCategoryInput()
+                    binding.chipOther.isChecked = false
+                }
+            }
+        }
+    }
+
+    private fun setupCustomCategoryHandlers() {
+        binding.confirmCategoryButton.setOnClickListener {
+            val categoryName = binding.customCategoryEditText.text.toString().trim()
+            if (categoryName.isNotEmpty()) {
+                if (customCategoryChip != null) {
+                    // Update existing chip
+                    customCategoryChip?.text = categoryName
+                } else {
+                    // Create new chip
+                    createCustomCategoryChip(categoryName)
+                }
+                hideCustomCategoryInput()
+            } else {
+                Toast.makeText(requireContext(), "Please enter a category name", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        binding.cancelCategoryButton.setOnClickListener {
+            hideCustomCategoryInput()
+            if (!isEditingCategory) {
+                binding.chipOther.isChecked = false
+            }
+            isEditingCategory = false
+        }
+    }
+
+    private fun createCustomCategoryChip(categoryName: String) {
+        customCategoryChip = Chip(requireContext()).apply {
+            text = categoryName
+            isCheckable = true
+            isChecked = true
+            setOnLongClickListener {
+                isEditingCategory = true
+                showCustomCategoryInput(categoryName)
+                true
+            }
+        }
+
+        binding.categoryChipGroup.addView(customCategoryChip)
+        binding.chipOther.isChecked = false
+    }
+
+    private fun showCustomCategoryInput(existingCategory: String = "") {
+        binding.customCategoryLayout.visibility = View.VISIBLE
+        binding.customCategoryEditText.setText(existingCategory)
+        binding.customCategoryEditText.requestFocus()
+    }
+
+    private fun hideCustomCategoryInput() {
+        binding.customCategoryLayout.visibility = View.GONE
+        binding.customCategoryEditText.text?.clear()
+        isEditingCategory = false
     }
 
     private fun showImagePickerOptions() {
@@ -202,15 +280,7 @@ class UploadPostFragment : BaseFragment() {
             binding.chipParty.isChecked -> "Party"
             binding.chipFormal.isChecked -> "Formal"
             binding.chipEvening.isChecked -> "Evening"
-            binding.chipOther.isChecked -> {
-                val customCategory = binding.otherCategoryEditText.text.toString().trim()
-                if (customCategory.isEmpty()) {
-                    Toast.makeText(requireContext(), "Please enter a custom category", Toast.LENGTH_SHORT).show()
-                    ""
-                } else {
-                    customCategory
-                }
-            }
+            customCategoryChip?.isChecked == true -> customCategoryChip?.text.toString()
             else -> ""
         }
     }
