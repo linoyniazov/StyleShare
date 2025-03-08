@@ -38,4 +38,6 @@
         app:itemTextColor="@color/bottom_nav_text_color" />
 
 
+
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

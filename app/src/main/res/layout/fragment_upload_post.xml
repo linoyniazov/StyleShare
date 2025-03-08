@@ -12,11 +12,15 @@
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
-            android:layout_width="match_parent"
+            style="@style/Widget.MaterialComponents.Toolbar.Surface"
+            android:layout_width="wrap_content"
             android:layout_height="?attr/actionBarSize"
+            android:layout_marginTop="28dp"
+            app:layout_constraintBottom_toTopOf="@+id/postImage"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:title="New post"
-            style="@style/Widget.MaterialComponents.Toolbar.Surface"/>
+            app:title="New post" />
 
         <ImageView
             android:id="@+id/postImage"
@@ -34,6 +38,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:hint="Write a caption about your look...."
+            app:boxStrokeColor="@color/black"
+            app:boxStrokeWidth="2dp"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             app:layout_constraintTop_toBottomOf="@id/postImage">
 
@@ -62,6 +68,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             app:singleSelection="true"
+            app:selectionRequired="true"
             app:layout_constraintTop_toBottomOf="@id/categoryLabel">
 
             <com.google.android.material.chip.Chip
@@ -69,43 +76,73 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Casual"
-                style="@style/Widget.MaterialComponents.Chip.Choice"/>
+                style="@style/Widget.MaterialComponents.Chip.Filter"
+                app:chipBackgroundColor="@color/chip_background_color"
+                android:textStyle="normal"/>
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chipElegant"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Elegant"
-                style="@style/Widget.MaterialComponents.Chip.Choice"/>
+                style="@style/Widget.MaterialComponents.Chip.Filter"
+                app:chipBackgroundColor="@color/chip_background_color"
+                android:textStyle="normal"/>
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chipParty"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Party"
-                style="@style/Widget.MaterialComponents.Chip.Choice"/>
+                style="@style/Widget.MaterialComponents.Chip.Filter"
+                app:chipBackgroundColor="@color/chip_background_color"
+                android:textStyle="normal"/>
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chipFormal"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Formal"
-                style="@style/Widget.MaterialComponents.Chip.Choice"/>
+                style="@style/Widget.MaterialComponents.Chip.Filter"
+                app:chipBackgroundColor="@color/chip_background_color"
+                android:textStyle="normal"/>
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chipEvening"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Evening"
-                style="@style/Widget.MaterialComponents.Chip.Choice"/>
+                style="@style/Widget.MaterialComponents.Chip.Filter"
+                app:chipBackgroundColor="@color/chip_background_color"
+                android:textStyle="normal"/>
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chipOther"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Other"
-                style="@style/Widget.MaterialComponents.Chip.Choice"/>
+                style="@style/Widget.MaterialComponents.Chip.Filter"
+                app:chipBackgroundColor="@color/chip_background_color"
+                android:textStyle="normal"/>
         </com.google.android.material.chip.ChipGroup>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/otherCategoryInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:hint="Enter custom category"
+            android:visibility="gone"
+            app:boxStrokeColor="@color/black"
+            app:boxStrokeWidth="2dp"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            app:layout_constraintTop_toBottomOf="@id/categoryChipGroup">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/otherCategoryEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+        </com.google.android.material.textfield.TextInputLayout>
 
         <TextView
             android:id="@+id/itemsLabel"
@@ -115,66 +152,27 @@
             android:textSize="18sp"
             android:textStyle="bold"
             android:layout_marginTop="24dp"
-            app:layout_constraintTop_toBottomOf="@id/categoryChipGroup"
+            app:layout_constraintTop_toBottomOf="@id/otherCategoryInput"
             app:layout_constraintStart_toStartOf="parent"/>
 
+        <!-- Container for dynamic item fields -->
         <LinearLayout
-            android:id="@+id/itemsContainer"
+            android:id="@+id/dynamicItemsContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:layout_marginTop="8dp"
-            app:layout_constraintTop_toBottomOf="@id/itemsLabel">
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Item"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/itemNameInput"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"/>
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Shop/Brand"
-                android:layout_marginTop="8dp"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/shopBrandInput"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"/>
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Price"
-                android:layout_marginTop="8dp"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/priceInput"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="numberDecimal"/>
-            </com.google.android.material.textfield.TextInputLayout>
-        </LinearLayout>
+            app:layout_constraintTop_toBottomOf="@id/itemsLabel"/>
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/addMoreItemButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Add More Item"
+            android:text="Add Item"
             android:textColor="@color/black"
             android:layout_marginTop="16dp"
             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-            app:layout_constraintTop_toBottomOf="@id/itemsContainer"
+            app:layout_constraintTop_toBottomOf="@id/dynamicItemsContainer"
             app:layout_constraintStart_toStartOf="parent"/>
 
         <LinearLayout
@@ -204,7 +202,6 @@
                 android:text="Post"
                 android:textColor="@color/white"
                 android:backgroundTint="@color/black"
-
                 android:layout_marginStart="8dp"/>
         </LinearLayout>
 
