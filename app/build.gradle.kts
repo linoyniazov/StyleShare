@@ -66,6 +66,9 @@ dependencies {
     implementation(libs.firebase.firestore)
     implementation(libs.firebase.analytics)
     implementation(libs.firebase.auth.ktx)
+    implementation (libs.firebase.database.ktx)
+
+
 
     // Constraint Layout
     implementation(libs.androidx.constraintlayout)
@@ -77,6 +80,8 @@ dependencies {
     kapt(libs.androidx.room.compiler)
     implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.room.common)
+
+
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
