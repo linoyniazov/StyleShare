@@ -85,6 +85,9 @@ class UploadPostFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        setupChipGroupListeners()
+        setupCustomCategoryHandlers()
+
         binding.postImage.setOnClickListener {
             showImagePickerOptions()
         }
@@ -102,124 +105,84 @@ class UploadPostFragment : BaseFragment() {
         }
     }
 
-    private fun uploadPost(isDraft: Boolean) {
-        val caption = binding.captionEditText.text.toString()
-        val category = getSelectedCategory()
-        val items = getItemsFromViews()
-
-        if ((imageUri == null && imageBitmap == null) || caption.isEmpty() || category.isEmpty()) {
-            Toast.makeText(requireContext(), "Please select an image and enter details", Toast.LENGTH_SHORT).show()
-            return
+    private fun setupChipGroupListeners() {
+        binding.chipOther.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked && !isEditingCategory) {
+                showCustomCategoryInput()
+            }
         }
 
-        if (items.isEmpty()) {
-            Toast.makeText(requireContext(), "Please add at least one item", Toast.LENGTH_SHORT).show()
-            return
-        }
+        // Add listeners for all other chips
+        val chips = listOf(
+            binding.chipCasual,
+            binding.chipElegant,
+            binding.chipParty,
+            binding.chipFormal,
+            binding.chipEvening
+        )
 
-        if (imageUri != null) {
-            lifecycleScope.launch {
-                val uploadedImageUrl = CloudinaryModel.uploadImageFromUri(requireContext(), imageUri!!)
-                if (uploadedImageUrl != null) {
-                    savePostToFirestore(uploadedImageUrl, caption, category, items, isDraft)
+        chips.forEach { chip ->
+            chip.setOnCheckedChangeListener { _, isChecked ->
+                if (isChecked) {
+                    hideCustomCategoryInput()
+                    binding.chipOther.isChecked = false
+                }
+            }
+        }
+    }
+
+    private fun setupCustomCategoryHandlers() {
+        binding.confirmCategoryButton.setOnClickListener {
+            val categoryName = binding.customCategoryEditText.text.toString().trim()
+            if (categoryName.isNotEmpty()) {
+                if (customCategoryChip != null) {
+                    // Update existing chip
+                    customCategoryChip?.text = categoryName
                 } else {
-                    Toast.makeText(requireContext(), "Image upload failed", Toast.LENGTH_SHORT).show()
+                    // Create new chip
+                    createCustomCategoryChip(categoryName)
                 }
+                hideCustomCategoryInput()
+            } else {
+                Toast.makeText(requireContext(), "Please enter a category name", Toast.LENGTH_SHORT).show()
             }
-        } else if (imageBitmap != null) {
-            CloudinaryModel.uploadImageFromBitmap(imageBitmap!!, requireContext(),
-                onSuccess = { uploadedImageUrl ->
-                    savePostToFirestore(uploadedImageUrl, caption, category, items, isDraft)
-                },
-                onError = { errorMessage ->
-                    Toast.makeText(requireContext(), "Upload failed: $errorMessage", Toast.LENGTH_SHORT).show()
-                }
-            )
+        }
+
+        binding.cancelCategoryButton.setOnClickListener {
+            hideCustomCategoryInput()
+            if (!isEditingCategory) {
+                binding.chipOther.isChecked = false
+            }
+            isEditingCategory = false
         }
     }
 
-    private fun getSelectedCategory(): String {
-        val selectedChipId = binding.categoryChipGroup.checkedChipId
-        if (selectedChipId != View.NO_ID) {
-            val selectedChip = binding.categoryChipGroup.findViewById<Chip>(selectedChipId)
-            return selectedChip.text.toString()
-        }
-        return ""
-    }
-
-    private fun getItemsFromViews(): List<String> {
-        val items = mutableListOf<String>()
-        for (view in itemViews) {
-            val itemName = view.findViewById<TextInputEditText>(R.id.itemNameInput).text.toString()
-            val shopBrand = view.findViewById<TextInputEditText>(R.id.shopBrandInput).text.toString()
-            val price = view.findViewById<TextInputEditText>(R.id.priceInput).text.toString()
-
-            if (itemName.isNotEmpty() && shopBrand.isNotEmpty() && price.isNotEmpty()) {
-                items.add("$itemName - $shopBrand - $price")
+    private fun createCustomCategoryChip(categoryName: String) {
+        customCategoryChip = Chip(requireContext()).apply {
+            text = categoryName
+            isCheckable = true
+            isChecked = true
+            setOnLongClickListener {
+                isEditingCategory = true
+                showCustomCategoryInput(categoryName)
+                true
             }
         }
-        return items
+
+        binding.categoryChipGroup.addView(customCategoryChip)
+        binding.chipOther.isChecked = false
     }
 
-    private fun savePostToFirestore(
-        imageUrl: String,
-        caption: String,
-        category: String,
-        items: List<String>,
-        isDraft: Boolean
-    ) {
-        val postId = UUID.randomUUID().toString()
-        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: "unknown_user"
-
-        val postData = hashMapOf(
-            "postId" to postId,
-            "userId" to userId,
-            "imageUrl" to imageUrl,
-            "caption" to caption,
-            "category" to category,
-            "timestamp" to System.currentTimeMillis(),
-            "likes" to 0,
-            "commentsCount" to 0,
-            "items" to items,
-            "isDraft" to isDraft
-        )
-
-        val db = FirebaseFirestore.getInstance()
-        db.collection("posts").document(postId)
-            .set(postData)
-            .addOnSuccessListener {
-                savePostToRoom(postId, userId, imageUrl, caption, category, items, isDraft)
-            }
-            .addOnFailureListener {
-                Toast.makeText(requireContext(), "Failed to save post to Firestore", Toast.LENGTH_SHORT).show()
-            }
+    private fun showCustomCategoryInput(existingCategory: String = "") {
+        binding.customCategoryLayout.visibility = View.VISIBLE
+        binding.customCategoryEditText.setText(existingCategory)
+        binding.customCategoryEditText.requestFocus()
     }
 
-    private fun savePostToRoom(
-        postId: String,
-        userId: String,
-        imageUrl: String,
-        caption: String,
-        category: String,
-        items: List<String>,
-        isDraft: Boolean
-    ) {
-        val post = Post(
-            postId = postId,
-            userId = userId,
-            imageUrl = imageUrl,
-            caption = caption,
-            category = category,
-            timestamp = System.currentTimeMillis(),
-            likedBy = emptyList(),
-            commentsCount = 0,
-            items = items,
-            isDraft = isDraft
-        )
-
-        postViewModel.insertPost(post)
-        Toast.makeText(requireContext(), "Post uploaded successfully!", Toast.LENGTH_SHORT).show()
-        findNavController().navigateUp()
+    private fun hideCustomCategoryInput() {
+        binding.customCategoryLayout.visibility = View.GONE
+        binding.customCategoryEditText.text?.clear()
+        isEditingCategory = false
     }
 
     private fun showImagePickerOptions() {
@@ -242,10 +205,10 @@ class UploadPostFragment : BaseFragment() {
         itemCount++
         val itemView = layoutInflater.inflate(R.layout.item_post_fields, binding.dynamicItemsContainer, false)
 
-        // עדכון המספור של הפריט
+        // Update the item number
         itemView.findViewById<TextView>(R.id.itemNumberLabel).text = "Item $itemCount"
 
-        // הוספת כפתור להסרת הפריט
+        // Set up remove button
         itemView.findViewById<MaterialButton>(R.id.removeItemButton).setOnClickListener {
             binding.dynamicItemsContainer.removeView(itemView)
             itemViews.remove(itemView)
@@ -261,6 +224,121 @@ class UploadPostFragment : BaseFragment() {
             view.findViewById<TextView>(R.id.itemNumberLabel).text = "Item ${index + 1}"
         }
         itemCount = itemViews.size
+    }
+
+    private fun uploadPost(isDraft: Boolean) {
+        val caption = binding.captionEditText.text.toString()
+        val category = getSelectedCategory()
+        val items = getItemsFromViews()
+
+        if ((imageUri == null && imageBitmap == null) || caption.isEmpty() || category.isEmpty()) {
+            Toast.makeText(requireContext(), "Please select an image and enter details", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        if (items.isEmpty()) {
+            Toast.makeText(requireContext(), "Please add at least one item", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val uploadSuccess: (String) -> Unit = { uploadedImageUrl ->
+            savePostToFirestore(uploadedImageUrl, caption, category, items, isDraft)
+        }
+
+        val uploadError: (String) -> Unit = { errorMessage ->
+            Toast.makeText(requireContext(), "Upload failed: $errorMessage", Toast.LENGTH_SHORT).show()
+        }
+
+        when {
+            imageUri != null -> lifecycleScope.launch {
+                CloudinaryModel.uploadImageFromUri(requireContext(), imageUri!!)?.let(uploadSuccess) ?: uploadError("Image upload failed")
+            }
+            imageBitmap != null -> CloudinaryModel.uploadImageFromBitmap(imageBitmap!!, requireContext(), onSuccess = uploadSuccess, onError = uploadError)
+        }
+    }
+
+
+    private fun getSelectedCategory(): String {
+        val selectedChipId = binding.categoryChipGroup.checkedChipId
+        return if (selectedChipId != View.NO_ID) {
+            binding.categoryChipGroup.findViewById<Chip>(selectedChipId)?.text.toString()
+        } else {
+            customCategoryChip?.takeIf { it.isChecked }?.text.toString()
+        }
+    }
+
+    private fun getItemsFromViews(): List<String> {
+        return itemViews.mapNotNull { view ->
+            val itemName = view.findViewById<TextInputEditText>(R.id.itemNameInput).text.toString().trim()
+            val shopBrand = view.findViewById<TextInputEditText>(R.id.shopBrandInput).text.toString().trim()
+            val price = view.findViewById<TextInputEditText>(R.id.priceInput).text.toString().trim()
+
+            if (itemName.isNotEmpty() && shopBrand.isNotEmpty() && price.isNotEmpty()) {
+                "$itemName - $shopBrand - $price"
+            } else null
+        }
+    }
+
+
+    private fun savePostToFirestore(
+        imageUrl: String,
+        caption: String,
+        category: String,
+        items: List<String>,
+        isDraft: Boolean
+    ) {
+        val postId = UUID.randomUUID().toString()
+        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
+
+        val postData = mapOf(
+            "postId" to postId,
+            "userId" to userId,
+            "imageUrl" to imageUrl,
+            "caption" to caption,
+            "category" to category,
+            "timestamp" to System.currentTimeMillis(),
+            "likes" to 0,
+            "commentsCount" to 0,
+            "items" to items,
+            "isDraft" to isDraft
+        )
+
+        FirebaseFirestore.getInstance().collection("posts").document(postId)
+            .set(postData)
+            .addOnSuccessListener {
+                savePostToRoom(postId, userId, imageUrl, caption, category, items, isDraft)
+            }
+            .addOnFailureListener { error ->
+                Log.e("FirestoreError", "Failed to save post: ${error.message}")
+                Toast.makeText(requireContext(), "Failed to save post", Toast.LENGTH_SHORT).show()
+            }
+    }
+
+
+    private fun savePostToRoom(
+        postId: String,
+        userId: String,
+        imageUrl: String,
+        caption: String,
+        category: String,
+        items: List<String>,
+        isDraft: Boolean
+    ) {
+        val post = Post(
+            postId = postId,
+            userId = userId,
+            imageUrl = imageUrl,
+            caption = caption,
+            category = category,
+            timestamp = System.currentTimeMillis(),
+            likedBy = emptyList(),
+            commentsCount = 0,
+            items = items,
+            isDraft = isDraft
+        )
+        postViewModel.insertPost(post)
+        Toast.makeText(requireContext(), "Post uploaded successfully!", Toast.LENGTH_SHORT).show()
+        findNavController().navigateUp()
     }
 
     override fun onDestroyView() {
