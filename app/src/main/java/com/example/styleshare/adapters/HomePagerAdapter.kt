@@ -7,14 +7,14 @@ import com.example.styleshare.ui.home.ForYouFragment
 import com.example.styleshare.ui.home.FollowingFragment
 
 class HomePagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
-    override fun getItemCount(): Int = 3
+
+    override fun getItemCount(): Int = 2
 
     override fun createFragment(position: Int): Fragment {
         return when (position) {
-            0 -> AllPostsFragment()
-            1 -> ForYouFragment()
-            2 -> FollowingFragment()
-            else -> throw IllegalStateException("Unexpected position $position")
+            0 -> ForYouFragment()   // טאב של "For You"
+            1 -> FollowingFragment() // טאב של "Following"
+            else -> throw IllegalArgumentException("Invalid position: $position")
         }
     }
 }

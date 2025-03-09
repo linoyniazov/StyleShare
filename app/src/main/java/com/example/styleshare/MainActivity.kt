@@ -16,10 +16,12 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var navController: NavController
     private lateinit var binding: ActivityMainBinding
-    private val homeViewModel: HomeViewModel by viewModels {
-        val database = AppDatabase.getDatabase(this)
-        HomeViewModelFactory(HomeRepository(database.postDao(), database.followDao()))
-    }
+
+    // ✅ פתרון - יצירת ה-ViewModel בצורה נכונה
+    private val database by lazy { AppDatabase.getDatabase(this) }
+    private val repository by lazy { HomeRepository(database.postDao(), database.followDao()) }
+    private val factory by lazy { HomeViewModel.HomeViewModelFactory(repository) }
+    private val homeViewModel: HomeViewModel by viewModels { factory }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,8 +49,8 @@ class MainActivity : AppCompatActivity() {
                     true
                 }
                 R.id.addPostFragment -> {
-                    if (currentDestination != R.id.addPostFragment) {
-                        navController.navigate(R.id.addPostFragment)
+                    if (currentDestination != R.id.uploadPostFragment) {
+                        navController.navigate(R.id.uploadPostFragment)
                     }
                     true
                 }
@@ -79,3 +81,4 @@ class MainActivity : AppCompatActivity() {
         updateNavigationVisibility(true, true) // Default: Show both toolbar and bottom nav
     }
 }
+

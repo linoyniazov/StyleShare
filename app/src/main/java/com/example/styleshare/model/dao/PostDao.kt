@@ -54,5 +54,8 @@ interface PostDao {
     @Query("SELECT * FROM posts ORDER BY likes DESC LIMIT 20")
     fun getPopularPosts(): LiveData<List<Post>>
 
+    @Query("SELECT * FROM posts ORDER BY timestamp DESC")
+    suspend fun getAllPostsSync(): List<Post>
+
 
 }

@@ -1,11 +1,20 @@
 package com.example.styleshare.viewmodel
+
 import android.util.Log
 import androidx.lifecycle.*
 import com.example.styleshare.model.entities.Post
 import com.example.styleshare.repository.HomeRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class HomeViewModel(private val repository: HomeRepository) : ViewModel() {
+
+    fun checkDatabase() {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.checkDatabase() // ✅ קריאה תקינה בתוך Coroutine
+        }
+    }
+
 
     private val _followingUsers = MutableLiveData<List<String>>(emptyList()) // ✅ הגדרה מפורשת
     val followingUsers: LiveData<List<String>> get() = _followingUsers
@@ -38,5 +47,6 @@ class HomeViewModel(private val repository: HomeRepository) : ViewModel() {
             throw IllegalArgumentException("Unknown ViewModel class")
         }
     }
+
 
 }

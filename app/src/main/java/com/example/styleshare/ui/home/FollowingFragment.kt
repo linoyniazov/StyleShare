@@ -4,20 +4,29 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.util.Log
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.recyclerview.widget.StaggeredGridLayoutManager
-import com.example.styleshare.adapters.PostAdapter
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.styleshare.databinding.FragmentFollowingBinding
 import com.example.styleshare.viewmodel.HomeViewModel
+import com.example.styleshare.adapters.PostAdapter
+import com.example.styleshare.model.AppDatabase
+import com.example.styleshare.repository.HomeRepository
 
 class FollowingFragment : Fragment() {
+
     private var _binding: FragmentFollowingBinding? = null
     private val binding get() = _binding!!
-    private val homeViewModel: HomeViewModel by viewModels()
+    private val homeViewModel: HomeViewModel by viewModels {
+        HomeViewModel.HomeViewModelFactory(HomeRepository(
+            AppDatabase.getDatabase(requireContext()).postDao(),
+            AppDatabase.getDatabase(requireContext()).followDao()
+        ))
+    }
     private lateinit var postAdapter: PostAdapter
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         _binding = FragmentFollowingBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -27,10 +36,16 @@ class FollowingFragment : Fragment() {
 
         postAdapter = PostAdapter()
         binding.recyclerViewPosts.adapter = postAdapter
-        binding.recyclerViewPosts.layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
+        binding.recyclerViewPosts.layoutManager = LinearLayoutManager(requireContext())
 
         homeViewModel.followingPosts.observe(viewLifecycleOwner) { posts ->
-            postAdapter.submitList(posts)
+            Log.d("FollowingFragment", "Number of posts received: ${posts.size}")
+            if (posts.isNotEmpty()) {
+                postAdapter.submitList(posts)
+                binding.recyclerViewPosts.visibility = View.VISIBLE
+            } else {
+                binding.recyclerViewPosts.visibility = View.GONE
+            }
         }
     }
 
