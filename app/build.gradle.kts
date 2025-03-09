@@ -99,4 +99,10 @@ dependencies {
 
     //cloudinary
     implementation (libs.cloudinary.android)
+
+    implementation(libs.glide)
+    kapt("com.github.bumptech.glide:compiler:4.15.1")
+
+    implementation (libs.androidx.lifecycle.livedata.ktx)
+
 }

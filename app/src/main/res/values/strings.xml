@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">StyleShare</string>
+    <string name="post_image_desc">Description of the post image</string>
+
     <!-- TODO: Remove or change this placeholder text -->
     <!-- Login Screen -->
     <string name="login_title">Log in</string>

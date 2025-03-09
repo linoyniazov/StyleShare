@@ -44,4 +44,15 @@ interface PostDao {
 
     @Query("DELETE FROM posts WHERE postId = :postId")
     suspend fun deletePost(postId: String)
+
+    @Query("SELECT * FROM posts WHERE userId IN (:userIds)")
+    fun getPostsByUsers(userIds: List<String>): LiveData<List<Post>>
+
+    @Query("SELECT followingId FROM follows WHERE userId = :userId")
+    suspend fun getFollowingUserIds(userId: String): List<String>
+
+    @Query("SELECT * FROM posts ORDER BY likes DESC LIMIT 20")
+    fun getPopularPosts(): LiveData<List<Post>>
+
+
 }

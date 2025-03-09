@@ -43,4 +43,8 @@ class PostRepository(private val postDao: PostDao) {
     suspend fun deletePost(postId: String) {
         postDao.deletePost(postId)
     }
+    fun getFollowingPosts(followedUserIds: List<String>): LiveData<List<Post>> {
+        return postDao.getPostsByUsers(followedUserIds)
+    }
+
 }
