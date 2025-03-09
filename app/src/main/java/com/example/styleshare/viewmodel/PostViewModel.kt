@@ -8,6 +8,7 @@ import kotlinx.coroutines.launch
 class PostViewModel(private val repository: PostRepository) : ViewModel() {
 
     val allPosts: LiveData<List<Post>> = repository.getAllPosts()
+    val followingPosts: LiveData<List<Post>> = repository.getFollowingPosts(listOf()) // Pass an empty list or appropriate value
 
     fun insertPost(post: Post) = viewModelScope.launch {
         repository.insertPost(post)
@@ -37,7 +38,10 @@ class PostViewModel(private val repository: PostRepository) : ViewModel() {
         repository.deletePost(postId)
     }
 
-    /** ✅ תיקון ה- Factory כך שלא יעביר Context ל- ViewModel **/
+    fun getFollowingPosts(followedUserIds: List<String>): LiveData<List<Post>> {
+        return repository.getPostsByUser(followedUserIds.toString())
+    }
+
     class PostViewModelFactory(private val repository: PostRepository) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             if (modelClass.isAssignableFrom(PostViewModel::class.java)) {
