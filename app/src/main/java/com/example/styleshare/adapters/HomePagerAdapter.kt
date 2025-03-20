@@ -2,7 +2,6 @@ package com.example.styleshare.adapters
 
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
-import com.example.styleshare.ui.home.AllPostsFragment
 import com.example.styleshare.ui.home.ForYouFragment
 import com.example.styleshare.ui.home.FollowingFragment
 

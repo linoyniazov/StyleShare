@@ -41,6 +41,9 @@ class PostViewModel(private val repository: PostRepository) : ViewModel() {
     fun getFollowingPosts(followedUserIds: List<String>): LiveData<List<Post>> {
         return repository.getPostsByUser(followedUserIds.toString())
     }
+    fun searchPosts(query: String): LiveData<List<Post>> {
+        return repository.searchPosts(query)
+    }
 
     class PostViewModelFactory(private val repository: PostRepository) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {

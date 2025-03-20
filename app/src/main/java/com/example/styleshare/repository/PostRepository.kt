@@ -46,5 +46,9 @@ class PostRepository(private val postDao: PostDao) {
     fun getFollowingPosts(followedUserIds: List<String>): LiveData<List<Post>> {
         return postDao.getPostsByUsers(followedUserIds)
     }
+    fun searchPosts(query: String): LiveData<List<Post>> {
+        return postDao.searchPosts(query)
+    }
+
 
 }

@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.util.Log
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.styleshare.databinding.FragmentForYouBinding
 import com.example.styleshare.viewmodel.HomeViewModel
@@ -30,11 +31,14 @@ class ForYouFragment : Fragment() {
         _binding = FragmentForYouBinding.inflate(inflater, container, false)
         return binding.root
     }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        postAdapter = PostAdapter()
+        postAdapter = PostAdapter { post ->
+            val action = ForYouFragmentDirections.actionForYouToPostDetail(post.postId)
+            findNavController().navigate(action)
+        }
+
         binding.recyclerViewPosts.adapter = postAdapter
         binding.recyclerViewPosts.layoutManager = LinearLayoutManager(requireContext())
 
@@ -48,6 +52,7 @@ class ForYouFragment : Fragment() {
             }
         }
     }
+
 
     override fun onDestroyView() {
         super.onDestroyView()

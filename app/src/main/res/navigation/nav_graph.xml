@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     app:startDestination="@id/welcomeFragment">
 
-
     <!-- Welcome Screen -->
     <fragment
         android:id="@+id/welcomeFragment"
@@ -28,6 +27,9 @@
         <action
             android:id="@+id/action_loginFragment_to_registerEmailFragment"
             app:destination="@id/registerEmailFragment"/>
+        <action
+            android:id="@+id/action_loginFragment_to_homeFragment"
+            app:destination="@id/homeFragment"/>
     </fragment>
 
     <!-- Register Email Screen -->
@@ -48,7 +50,7 @@
             app:destination="@id/loginFragment"/>
     </fragment>
 
-    <!-- Register Password Screen (No homeFragment) -->
+    <!-- Register Password Screen -->
     <fragment
         android:id="@+id/registerPasswordFragment"
         android:name="com.example.styleshare.ui.auth.RegisterPasswordFragment"
@@ -58,22 +60,84 @@
             android:name="email"
             app:argType="string"/>
     </fragment>
+
+    <!-- Upload Post Screen -->
     <fragment
         android:id="@+id/uploadPostFragment"
         android:name="com.example.styleshare.ui.post.UploadPostFragment"
         android:label="Upload Post"
         tools:layout="@layout/fragment_upload_post"/>
 
+    <!-- Home Screen -->
     <fragment
         android:id="@+id/homeFragment"
         android:name="com.example.styleshare.ui.home.HomeFragment"
         android:label="Home"
         tools:layout="@layout/fragment_home">
 
-        <!-- אם יש מעבר לעמוד אחר, נגדיר פעולה (action) -->
         <action
             android:id="@+id/action_homeFragment_to_uploadPostFragment"
-            app:destination="@id/uploadPostFragment" />
+            app:destination="@id/uploadPostFragment"/>
+    </fragment>
+
+    <!-- Search Page Screen (נוסף) -->
+    <fragment
+        android:id="@+id/searchPageFragment"
+        android:name="com.example.styleshare.ui.search.SearchPageFragment"
+        android:label="Search"
+        tools:layout="@layout/fragment_search_page">
+        <action
+            android:id="@+id/action_searchToPostDetail"
+            app:destination="@id/postDetailFragment">
+            <argument
+                android:name="postId"
+                app:argType="string"
+                app:nullable="false"/>
+        </action>
+    </fragment>
+
+    <!-- Post Detail Screen (נוסף) -->
+    <fragment
+        android:id="@+id/postDetailFragment"
+        android:name="com.example.styleshare.ui.post.PostDetailFragment"
+        android:label="Post Detail"
+        tools:layout="@layout/fragment_post_detail">
+        <argument
+            android:name="postId"
+            app:argType="string"
+            app:nullable="false"/>
+    </fragment>
+
+    <!-- For You Screen -->
+    <fragment
+        android:id="@+id/forYouFragment"
+        android:name="com.example.styleshare.ui.home.ForYouFragment"
+        android:label="For You"
+        tools:layout="@layout/fragment_for_you">
+        <action
+            android:id="@+id/action_forYouToPostDetail"
+            app:destination="@id/postDetailFragment">
+            <argument
+                android:name="postId"
+                app:argType="string"
+                app:nullable="false"/>
+        </action>
+    </fragment>
+
+    <!-- Following Screen -->
+    <fragment
+        android:id="@+id/followingFragment"
+        android:name="com.example.styleshare.ui.home.FollowingFragment"
+        android:label="Following"
+        tools:layout="@layout/fragment_following">
+        <action
+            android:id="@+id/action_followingToPostDetail"
+            app:destination="@id/postDetailFragment">
+            <argument
+                android:name="postId"
+                app:argType="string"
+                app:nullable="false"/>
+        </action>
     </fragment>
 
 </navigation>
