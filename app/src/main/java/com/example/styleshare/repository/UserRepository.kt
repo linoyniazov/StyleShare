@@ -25,8 +25,6 @@ class UserRepository(private val userDao: UserDao) {
         fullName: String,
         profileImageUrl: String,
         bio: String,
-        followersCount: String,
-        followingCount: String,
         postsCount: Int
     ) {
         userDao.updateUser(
@@ -36,19 +34,11 @@ class UserRepository(private val userDao: UserDao) {
             fullName,
             profileImageUrl,
             bio,
-            followersCount,
-            followingCount,
             postsCount,
         )
     }
 
-    suspend fun updateFollowersCount(userId: String, increment: Int) {
-        userDao.updateFollowersCount(userId, increment)
-    }
 
-    suspend fun updateFollowingCount(userId: String, increment: Int) {
-        userDao.updateFollowingCount(userId, increment)
-    }
 
     suspend fun updatePostsCount(userId: String, increment: Int) {
         userDao.updatePostsCount(userId, increment)

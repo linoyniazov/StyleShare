@@ -8,7 +8,6 @@ import kotlinx.coroutines.launch
 class PostViewModel(private val repository: PostRepository) : ViewModel() {
 
     val allPosts: LiveData<List<Post>> = repository.getAllPosts()
-    val followingPosts: LiveData<List<Post>> = repository.getFollowingPosts(listOf()) // Pass an empty list or appropriate value
 
     fun insertPost(post: Post) = viewModelScope.launch {
         repository.insertPost(post)
@@ -26,24 +25,11 @@ class PostViewModel(private val repository: PostRepository) : ViewModel() {
         repository.updatePost(postId, caption, category)
     }
 
-    fun updateLikes(postId: String, increment: Int) = viewModelScope.launch {
-        repository.updateLikes(postId, increment)
-    }
-
-    fun updateCommentsCount(postId: String, increment: Int) = viewModelScope.launch {
-        repository.updateCommentsCount(postId, increment)
-    }
 
     fun deletePost(postId: String) = viewModelScope.launch {
         repository.deletePost(postId)
     }
 
-    fun getFollowingPosts(followedUserIds: List<String>): LiveData<List<Post>> {
-        return repository.getPostsByUser(followedUserIds.toString())
-    }
-    fun searchPosts(query: String): LiveData<List<Post>> {
-        return repository.searchPosts(query)
-    }
 
     class PostViewModelFactory(private val repository: PostRepository) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {

@@ -56,9 +56,13 @@
         android:name="com.example.styleshare.ui.auth.RegisterPasswordFragment"
         android:label="Register Password"
         tools:layout="@layout/fragment_register_password">
+        <action
+            android:id="@+id/action_registerPasswordFragment_to_homeFragment"
+            app:destination="@id/homeFragment"/>
         <argument
             android:name="email"
             app:argType="string"/>
+
     </fragment>
 
     <!-- Upload Post Screen -->
@@ -74,29 +78,12 @@
         android:name="com.example.styleshare.ui.home.HomeFragment"
         android:label="Home"
         tools:layout="@layout/fragment_home">
-
         <action
             android:id="@+id/action_homeFragment_to_uploadPostFragment"
             app:destination="@id/uploadPostFragment"/>
     </fragment>
 
-    <!-- Search Page Screen (נוסף) -->
-    <fragment
-        android:id="@+id/searchPageFragment"
-        android:name="com.example.styleshare.ui.search.SearchPageFragment"
-        android:label="Search"
-        tools:layout="@layout/fragment_search_page">
-        <action
-            android:id="@+id/action_searchToPostDetail"
-            app:destination="@id/postDetailFragment">
-            <argument
-                android:name="postId"
-                app:argType="string"
-                app:nullable="false"/>
-        </action>
-    </fragment>
-
-    <!-- Post Detail Screen (נוסף) -->
+    <!-- Post Detail Screen -->
     <fragment
         android:id="@+id/postDetailFragment"
         android:name="com.example.styleshare.ui.post.PostDetailFragment"
@@ -106,38 +93,6 @@
             android:name="postId"
             app:argType="string"
             app:nullable="false"/>
-    </fragment>
-
-    <!-- For You Screen -->
-    <fragment
-        android:id="@+id/forYouFragment"
-        android:name="com.example.styleshare.ui.home.ForYouFragment"
-        android:label="For You"
-        tools:layout="@layout/fragment_for_you">
-        <action
-            android:id="@+id/action_forYouToPostDetail"
-            app:destination="@id/postDetailFragment">
-            <argument
-                android:name="postId"
-                app:argType="string"
-                app:nullable="false"/>
-        </action>
-    </fragment>
-
-    <!-- Following Screen -->
-    <fragment
-        android:id="@+id/followingFragment"
-        android:name="com.example.styleshare.ui.home.FollowingFragment"
-        android:label="Following"
-        tools:layout="@layout/fragment_following">
-        <action
-            android:id="@+id/action_followingToPostDetail"
-            app:destination="@id/postDetailFragment">
-            <argument
-                android:name="postId"
-                app:argType="string"
-                app:nullable="false"/>
-        </action>
     </fragment>
 
 </navigation>

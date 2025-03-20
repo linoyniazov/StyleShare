@@ -9,32 +9,11 @@ import kotlinx.coroutines.launch
 
 class HomeViewModel(private val repository: HomeRepository) : ViewModel() {
 
+    val allPosts: LiveData<List<Post>> = repository.getAllPosts()
+
     fun checkDatabase() {
         viewModelScope.launch(Dispatchers.IO) {
             repository.checkDatabase() // ✅ קריאה תקינה בתוך Coroutine
-        }
-    }
-
-
-    private val _followingUsers = MutableLiveData<List<String>>(emptyList()) // ✅ הגדרה מפורשת
-    val followingUsers: LiveData<List<String>> get() = _followingUsers
-
-    val allPosts: LiveData<List<Post>> = repository.getAllPosts()
-    val forYouPosts: LiveData<List<Post>> = repository.getPopularPosts()
-
-    // ✅ טעינת פוסטים של משתמשים שאחריהם המשתמש עוקב
-    val followingPosts: LiveData<List<Post>> = _followingUsers.switchMap { users ->
-        val posts = repository.getFollowingPosts(users)
-        Log.d("HomeViewModel", "מספר הפוסטים שהתקבלו: ${posts.value?.size ?: 0}")
-        posts
-    }
-
-    // ✅ פונקציה לטעינת המשתמשים שאחריהם המשתמש עוקב
-    fun loadFollowingUsers(userId: String) {
-        viewModelScope.launch {
-            val users = repository.getFollowingUserIds(userId)
-            Log.d("HomeViewModel", "משתמשים שאחריהם עוקבים: $users")
-            _followingUsers.postValue(users)
         }
     }
 

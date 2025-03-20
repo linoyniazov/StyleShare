@@ -12,7 +12,5 @@ data class User(
     val fullName: String,
     val profileImageUrl: String,
     val bio: String,
-    val followersCount: Int = 0,
-    val followingCount: Int = 0,
     val postsCount: Int = 0
 )

@@ -17,7 +17,7 @@ import com.example.styleshare.utils.Converters
     ],
     indices = [Index("userId")]
 )
-@TypeConverters(Converters::class) // שימוש בקונברטר ל- Room עבור רשימת items
+@TypeConverters(Converters::class)
 data class Post(
     @PrimaryKey val postId: String,
     val userId: String,
@@ -25,14 +25,10 @@ data class Post(
     val caption: String,
     val category: String,
     val timestamp: Long,
-    val likes: Int = 0,
-    val commentsCount: Int = 0,
     val imageWidth: Int? = null,
     val imageHeight: Int? = null,
     val edited: Boolean = false,
     val editedTimestamp: Long? = null,
-    val isDraft: Boolean = false, // ✅ שדה חדש - מאפשר שמירה כטיוטה
-    val items: List<String> = listOf(), // ✅ נשמר כרשימה באמצעות TypeConverter
-    val likedBy: List<String> = listOf() // ✅ רשימת משתמשים שלחצו על לייק
-
+    val isDraft: Boolean = false,
+    val items: List<String> = listOf()
 )

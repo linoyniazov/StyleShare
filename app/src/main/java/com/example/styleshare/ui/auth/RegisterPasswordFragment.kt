@@ -11,6 +11,13 @@ import androidx.navigation.fragment.navArgs
 import com.example.styleshare.databinding.FragmentRegisterPasswordBinding
 import com.example.styleshare.ui.BaseFragment
 import com.google.firebase.auth.FirebaseAuth
+import androidx.fragment.app.viewModels
+import com.example.styleshare.R
+import com.example.styleshare.model.AppDatabase
+import com.example.styleshare.repository.UserRepository
+import com.example.styleshare.viewmodel.UserViewModel
+import com.example.styleshare.model.entities.User
+
 
 class RegisterPasswordFragment : BaseFragment() {
 
@@ -18,6 +25,11 @@ class RegisterPasswordFragment : BaseFragment() {
     override val showBottomNav: Boolean = false
     override val showBackButton: Boolean = true
 
+    private val userViewModel: UserViewModel by viewModels {
+        UserViewModel.UserViewModelFactory(
+            UserRepository(AppDatabase.getDatabase(requireContext()).userDao())
+        )
+    }
 
     private var _binding: FragmentRegisterPasswordBinding? = null
     private val binding get() = _binding!!
@@ -82,9 +94,18 @@ class RegisterPasswordFragment : BaseFragment() {
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     Toast.makeText(requireContext(), "Registration Successful!", Toast.LENGTH_SHORT).show()
+                    val firebaseUser = auth.currentUser
+                    val newUser = User(
+                        userId = firebaseUser?.uid ?: "",
+                        username = "", // אפשר להשלים בהמשך
+                        email = firebaseUser?.email ?: "",
+                        fullName = "",
+                        profileImageUrl = "",
+                        bio = ""
+                    )
+                    userViewModel.insertUser(newUser)
+                    findNavController().navigate(R.id.action_registerPasswordFragment_to_homeFragment)
 
-//                    // 🔹 מעבר למסך התחברות לאחר ההרשמה
-//                    findNavController().navigate(R.id.action_registerPasswordFragment_to_loginFragment)
                 } else {
                     Toast.makeText(requireContext(), "Registration Failed: ${task.exception?.message}", Toast.LENGTH_LONG).show()
                 }

@@ -25,8 +25,6 @@ interface UserDao {
             fullName = :fullName,
             profileImageUrl = :profileImageUrl,
             bio = :bio,
-            followersCount = :followersCount,
-            followingCount = :followingCount,
             postsCount = :postsCount
         WHERE userId = :id
     """)
@@ -37,16 +35,10 @@ interface UserDao {
         fullName: String,
         profileImageUrl: String,
         bio: String,
-        followersCount: String,
-        followingCount: String,
         postsCount: Int
     )
 
-    @Query("UPDATE users SET followersCount = followersCount + :increment WHERE userId = :userId")
-    suspend fun updateFollowersCount(userId: String, increment: Int)
 
-    @Query("UPDATE users SET followingCount = followingCount + :increment WHERE userId = :userId")
-    suspend fun updateFollowingCount(userId: String, increment: Int)
 
     @Query("UPDATE users SET postsCount = postsCount + :increment WHERE userId = :userId")
     suspend fun updatePostsCount(userId: String, increment: Int)
