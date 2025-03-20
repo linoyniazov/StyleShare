@@ -12,10 +12,10 @@
         tools:layout="@layout/fragment_welcome">
         <action
             android:id="@+id/action_welcomeFragment_to_loginFragment"
-            app:destination="@id/loginFragment"/>
+            app:destination="@id/loginFragment" />
         <action
             android:id="@+id/action_welcomeFragment_to_registerEmailFragment"
-            app:destination="@id/registerEmailFragment"/>
+            app:destination="@id/registerEmailFragment" />
     </fragment>
 
     <!-- Login Screen -->
@@ -26,10 +26,10 @@
         tools:layout="@layout/fragment_login">
         <action
             android:id="@+id/action_loginFragment_to_registerEmailFragment"
-            app:destination="@id/registerEmailFragment"/>
+            app:destination="@id/registerEmailFragment" />
         <action
             android:id="@+id/action_loginFragment_to_homeFragment"
-            app:destination="@id/homeFragment"/>
+            app:destination="@id/homeFragment" />
     </fragment>
 
     <!-- Register Email Screen -->
@@ -40,14 +40,10 @@
         tools:layout="@layout/fragment_register_email">
         <action
             android:id="@+id/action_registerEmailFragment_to_registerPasswordFragment"
-            app:destination="@id/registerPasswordFragment">
-            <argument
-                android:name="email"
-                app:argType="string"/>
-        </action>
+            app:destination="@id/registerPasswordFragment" />
         <action
             android:id="@+id/action_registerEmailFragment_to_loginFragment"
-            app:destination="@id/loginFragment"/>
+            app:destination="@id/loginFragment" />
     </fragment>
 
     <!-- Register Password Screen -->
@@ -56,13 +52,28 @@
         android:name="com.example.styleshare.ui.auth.RegisterPasswordFragment"
         android:label="Register Password"
         tools:layout="@layout/fragment_register_password">
-        <action
-            android:id="@+id/action_registerPasswordFragment_to_homeFragment"
-            app:destination="@id/homeFragment"/>
+
+        <!-- פה נמצאים כל הפרמטרים שהמסך הזה מצפה להם -->
         <argument
             android:name="email"
-            app:argType="string"/>
+            app:argType="string"
+            app:nullable="false"/>
+        <argument
+            android:name="username"
+            app:argType="string"
+            app:nullable="false"/>
+        <argument
+            android:name="fullName"
+            app:argType="string"
+            app:nullable="false"/>
+        <argument
+            android:name="profileImageUrl"
+            app:argType="string"
+            app:nullable="false"/>
 
+        <action
+            android:id="@+id/action_registerPasswordFragment_to_homeFragment"
+            app:destination="@id/homeFragment" />
     </fragment>
 
     <!-- Upload Post Screen -->
@@ -70,7 +81,7 @@
         android:id="@+id/uploadPostFragment"
         android:name="com.example.styleshare.ui.post.UploadPostFragment"
         android:label="Upload Post"
-        tools:layout="@layout/fragment_upload_post"/>
+        tools:layout="@layout/fragment_upload_post" />
 
     <!-- Home Screen -->
     <fragment
@@ -80,7 +91,7 @@
         tools:layout="@layout/fragment_home">
         <action
             android:id="@+id/action_homeFragment_to_uploadPostFragment"
-            app:destination="@id/uploadPostFragment"/>
+            app:destination="@id/uploadPostFragment" />
     </fragment>
 
     <!-- Post Detail Screen -->
@@ -92,7 +103,7 @@
         <argument
             android:name="postId"
             app:argType="string"
-            app:nullable="false"/>
+            app:nullable="false" />
     </fragment>
 
 </navigation>
