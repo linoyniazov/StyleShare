@@ -4,31 +4,36 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.styleshare.databinding.FragmentHomeBinding
-import com.example.styleshare.viewmodel.HomeViewModel
-import com.example.styleshare.adapters.PostAdapter
-import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.example.styleshare.R
-import com.example.styleshare.repository.HomeRepository
+import com.example.styleshare.viewmodel.PostViewModel
+import com.example.styleshare.adapters.PostsAdapter
 import com.example.styleshare.model.AppDatabase
+import com.example.styleshare.repository.PostRepository
+import com.example.styleshare.ui.BaseFragment
 
+class HomeFragment : BaseFragment() {
+    override val showToolbar: Boolean = false
+    override val showBottomNav: Boolean = true
+    override val showBackButton: Boolean = false
 
-class HomeFragment : Fragment() {
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
 
-    private val homeViewModel: HomeViewModel by viewModels {
-        HomeViewModel.HomeViewModelFactory(
-            HomeRepository(AppDatabase.getDatabase(requireContext()).postDao())
+    private val postViewModel: PostViewModel by viewModels {
+        PostViewModel.PostViewModelFactory(
+            PostRepository(AppDatabase.getDatabase(requireContext()).postDao())
         )
     }
 
-    private lateinit var postAdapter: PostAdapter
+    private lateinit var postAdapter: PostsAdapter
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -36,29 +41,37 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // הסרת כפתור חזרה
-        binding.toolbar.navigationIcon = null
-        binding.toolbar.title = "StyleShare"
+        setupRecyclerView()
+        showLoading(true)
+        observePostsFromFirestore()
+    }
 
-        // הגדרת האדפטר וה-RecyclerView
-        postAdapter = PostAdapter { post ->
-            // פעולה בלחיצה על פוסט (אם תרצי לפתוח מסך פרטים או עריכה)
-        }
-
+    private fun setupRecyclerView() {
+        postAdapter = PostsAdapter()
         binding.recyclerView.apply {
             adapter = postAdapter
             layoutManager = LinearLayoutManager(requireContext())
-        }
-
-        // צפייה בנתוני הפוסטים מה-ViewModel
-        homeViewModel.allPosts.observe(viewLifecycleOwner) { posts ->
-            postAdapter.submitList(posts)
+            setHasFixedSize(true)
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        requireActivity().findViewById<BottomNavigationView>(R.id.bottomNavigation).visibility = View.VISIBLE
+    private fun observePostsFromFirestore() {
+        postViewModel.getAllPostsFromFirestore().observe(viewLifecycleOwner) { posts ->
+            postAdapter.submitList(posts)
+            showLoading(false)
+
+            if (posts.isEmpty()) {
+                binding.recyclerView.visibility = View.GONE
+                binding.noPostsText.visibility = View.VISIBLE
+            } else {
+                binding.recyclerView.visibility = View.VISIBLE
+                binding.noPostsText.visibility = View.GONE
+            }
+        }
+    }
+
+    private fun showLoading(isLoading: Boolean) {
+        binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
     }
 
     override fun onDestroyView() {

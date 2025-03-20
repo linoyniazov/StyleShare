@@ -7,6 +7,7 @@ import kotlinx.coroutines.launch
 
 class PostViewModel(private val repository: PostRepository) : ViewModel() {
 
+    // 🔁 שמור רק למקומות שצריכים ROOM
     val allPosts: LiveData<List<Post>> = repository.getAllPosts()
 
     fun insertPost(post: Post) = viewModelScope.launch {
@@ -25,11 +26,19 @@ class PostViewModel(private val repository: PostRepository) : ViewModel() {
         repository.updatePost(postId, caption, category)
     }
 
-
     fun deletePost(postId: String) = viewModelScope.launch {
         repository.deletePost(postId)
     }
 
+    // ✅ לשימוש במסך הבית (מ-Firestore)
+    fun getAllPostsFromFirestore(): LiveData<List<Post>> {
+        return repository.getAllPostsFromFirestore()
+    }
+
+    // (אופציונלי) אם רוצים גם לשמור ב-ROOM
+    fun syncPostsFromFirestore() = viewModelScope.launch {
+        repository.syncPostsFromFirestore()
+    }
 
     class PostViewModelFactory(private val repository: PostRepository) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {

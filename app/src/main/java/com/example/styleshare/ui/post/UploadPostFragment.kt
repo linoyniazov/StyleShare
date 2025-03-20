@@ -112,7 +112,6 @@ class UploadPostFragment : BaseFragment() {
             }
         }
 
-        // Add listeners for all other chips
         val chips = listOf(
             binding.chipCasual,
             binding.chipElegant,
@@ -136,10 +135,8 @@ class UploadPostFragment : BaseFragment() {
             val categoryName = binding.customCategoryEditText.text.toString().trim()
             if (categoryName.isNotEmpty()) {
                 if (customCategoryChip != null) {
-                    // Update existing chip
                     customCategoryChip?.text = categoryName
                 } else {
-                    // Create new chip
                     createCustomCategoryChip(categoryName)
                 }
                 hideCustomCategoryInput()
@@ -205,10 +202,8 @@ class UploadPostFragment : BaseFragment() {
         itemCount++
         val itemView = layoutInflater.inflate(R.layout.item_post_fields, binding.dynamicItemsContainer, false)
 
-        // Update the item number
         itemView.findViewById<TextView>(R.id.itemNumberLabel).text = "Item $itemCount"
 
-        // Set up remove button
         itemView.findViewById<MaterialButton>(R.id.removeItemButton).setOnClickListener {
             binding.dynamicItemsContainer.removeView(itemView)
             itemViews.remove(itemView)
@@ -257,7 +252,6 @@ class UploadPostFragment : BaseFragment() {
         }
     }
 
-
     private fun getSelectedCategory(): String {
         val selectedChipId = binding.categoryChipGroup.checkedChipId
         return if (selectedChipId != View.NO_ID) {
@@ -279,7 +273,6 @@ class UploadPostFragment : BaseFragment() {
         }
     }
 
-
     private fun savePostToFirestore(
         imageUrl: String,
         caption: String,
@@ -287,34 +280,39 @@ class UploadPostFragment : BaseFragment() {
         items: List<String>
     ) {
         val postId = UUID.randomUUID().toString()
-        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
+        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
 
-        val postData = mapOf(
-            "postId" to postId,
-            "userId" to userId,
-            "imageUrl" to imageUrl,
-            "caption" to caption,
-            "category" to category,
-            "timestamp" to System.currentTimeMillis(),
-            "items" to items
+        FirebaseFirestore.getInstance().collection("users").document(userId).get()
+            .addOnSuccessListener { document ->
+                val username = document.getString("username") ?: "Unknown"
 
-        )
+                val postData = mapOf(
+                    "postId" to postId,
+                    "userId" to userId,
+                    "username" to username,
+                    "imageUrl" to imageUrl,
+                    "caption" to caption,
+                    "category" to category,
+                    "timestamp" to System.currentTimeMillis(),
+                    "items" to items
+                )
 
-        FirebaseFirestore.getInstance().collection("posts").document(postId)
-            .set(postData)
-            .addOnSuccessListener {
-                savePostToRoom(postId, userId, imageUrl, caption, category, items)
-            }
-            .addOnFailureListener { error ->
-                Log.e("FirestoreError", "Failed to save post: ${error.message}")
-                Toast.makeText(requireContext(), "Failed to save post", Toast.LENGTH_SHORT).show()
+                FirebaseFirestore.getInstance().collection("posts").document(postId)
+                    .set(postData)
+                    .addOnSuccessListener {
+                        savePostToRoom(postId, userId, username, imageUrl, caption, category, items)
+                    }
+                    .addOnFailureListener { error ->
+                        Log.e("FirestoreError", "Failed to save post: ${error.message}")
+                        Toast.makeText(requireContext(), "Failed to save post", Toast.LENGTH_SHORT).show()
+                    }
             }
     }
-
 
     private fun savePostToRoom(
         postId: String,
         userId: String,
+        username: String,
         imageUrl: String,
         caption: String,
         category: String,
@@ -331,6 +329,7 @@ class UploadPostFragment : BaseFragment() {
             val post = Post(
                 postId = postId,
                 userId = userId,
+                username = username,
                 imageUrl = imageUrl,
                 caption = caption,
                 category = category,
@@ -343,7 +342,6 @@ class UploadPostFragment : BaseFragment() {
             findNavController().navigateUp()
         }
     }
-
 
     override fun onDestroyView() {
         super.onDestroyView()

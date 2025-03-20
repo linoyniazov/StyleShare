@@ -83,6 +83,13 @@
         android:label="Upload Post"
         tools:layout="@layout/fragment_upload_post" />
 
+    <!-- Posts List Screen -->
+    <fragment
+        android:id="@+id/postsListFragment"
+        android:name="com.example.styleshare.ui.post.PostsListFragment"
+        android:label="Posts"
+        tools:layout="@layout/fragment_posts_list" />
+
     <!-- Home Screen -->
     <fragment
         android:id="@+id/homeFragment"
