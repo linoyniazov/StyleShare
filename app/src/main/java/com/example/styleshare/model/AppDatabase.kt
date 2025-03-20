@@ -12,7 +12,7 @@ import com.example.styleshare.model.entities.User
 
 @Database(
     entities = [User::class, Post::class],
-    version = 1, // ✅ עדכון מספר גרסה
+    version = 2, // ✅ עדכון מספר גרסה
     exportSchema = false
 )
 @TypeConverters(Converters::class)
