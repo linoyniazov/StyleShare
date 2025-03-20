@@ -53,7 +53,7 @@
         android:label="Register Password"
         tools:layout="@layout/fragment_register_password">
 
-        <!-- פה נמצאים כל הפרמטרים שהמסך הזה מצפה להם -->
+        <!-- פרמטרים שהמסך הזה מצפה להם -->
         <argument
             android:name="email"
             app:argType="string"
@@ -92,6 +92,9 @@
         <action
             android:id="@+id/action_homeFragment_to_uploadPostFragment"
             app:destination="@id/uploadPostFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_profileFragment"
+            app:destination="@id/profileFragment" />
     </fragment>
 
     <!-- Post Detail Screen -->
@@ -105,5 +108,23 @@
             app:argType="string"
             app:nullable="false" />
     </fragment>
+
+    <!-- Profile Screen (✅ הוספתי את עמוד הפרופיל כאן) -->
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="com.example.styleshare.ui.profile.ProfileFragment"
+        android:label="Profile"
+        tools:layout="@layout/fragment_profile">
+        <action
+            android:id="@+id/action_profileFragment_to_editProfileFragment"
+            app:destination="@id/editProfileFragment" />
+    </fragment>
+
+    <!-- Edit Profile Screen -->
+    <fragment
+        android:id="@+id/editProfileFragment"
+        android:name="com.example.styleshare.ui.profile.EditProfileFragment"
+        android:label="Edit Profile"
+        tools:layout="@layout/fragment_edit_profile"/>
 
 </navigation>
