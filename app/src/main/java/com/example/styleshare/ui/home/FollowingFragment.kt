@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.util.Log
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.styleshare.databinding.FragmentFollowingBinding
 import com.example.styleshare.viewmodel.HomeViewModel
@@ -34,7 +35,11 @@ class FollowingFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        postAdapter = PostAdapter()
+        postAdapter = PostAdapter { post ->
+            val action = FollowingFragmentDirections.actionFollowingToPostDetail(post.postId)
+            findNavController().navigate(action)
+        }
+
         binding.recyclerViewPosts.adapter = postAdapter
         binding.recyclerViewPosts.layoutManager = LinearLayoutManager(requireContext())
 
@@ -48,6 +53,7 @@ class FollowingFragment : Fragment() {
             }
         }
     }
+
 
     override fun onDestroyView() {
         super.onDestroyView()

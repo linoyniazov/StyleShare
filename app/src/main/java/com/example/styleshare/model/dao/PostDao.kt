@@ -57,5 +57,8 @@ interface PostDao {
     @Query("SELECT * FROM posts ORDER BY timestamp DESC")
     suspend fun getAllPostsSync(): List<Post>
 
+    @Query("SELECT * FROM posts WHERE caption LIKE '%' || :query || '%' OR category LIKE '%' || :query || '%' ORDER BY timestamp DESC")
+    fun searchPosts(query: String): LiveData<List<Post>>
+
 
 }

@@ -10,13 +10,13 @@ import androidx.navigation.fragment.findNavController
 import com.example.styleshare.databinding.FragmentLoginBinding
 import com.example.styleshare.ui.BaseFragment
 import com.google.firebase.auth.FirebaseAuth
+import com.example.styleshare.R
 
 class LoginFragment : BaseFragment() {
 
     override val showToolbar: Boolean = true
     override val showBottomNav: Boolean = false
     override val showBackButton: Boolean = true
-
 
     private var _binding: FragmentLoginBinding? = null
     private val binding get() = _binding!!
@@ -44,15 +44,28 @@ class LoginFragment : BaseFragment() {
                 Toast.makeText(requireContext(), "Email and password cannot be empty", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
-
+//
+//            auth.signInWithEmailAndPassword(email, password)
+//                .addOnCompleteListener { task ->
+//                    if (task.isSuccessful) {
+//                        Toast.makeText(requireContext(), "Login Successful!", Toast.LENGTH_SHORT).show()
+//                        // Navigate to HomeFragment after successful login
+//                        findNavController().navigate(R.id.action_loginFragment_to_homeFragment)
+//                    } else {
+//                        Toast.makeText(requireContext(), "Login Failed: ${task.exception?.message}", Toast.LENGTH_LONG).show()
+//                    }
+//                }
             auth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
-                        Toast.makeText(requireContext(), "Login Successful!", Toast.LENGTH_SHORT).show()
-//                        // 🔹 מעבר למסך הבית או מסך ראשי
-//                        findNavController().navigate(R.id.action_loginFragment_to_homeFragment)
+                        if (isAdded) { // ✅ בודק אם ה-Fragment עדיין מחובר
+                            Toast.makeText(requireContext(), "Login Successful!", Toast.LENGTH_SHORT).show()
+                            findNavController().navigate(R.id.action_loginFragment_to_homeFragment)
+                        }
                     } else {
-                        Toast.makeText(requireContext(), "Login Failed: ${task.exception?.message}", Toast.LENGTH_LONG).show()
+                        if (isAdded) { // ✅ בודק שוב לפני הצגת הודעת שגיאה
+                            Toast.makeText(requireContext(), "Login Failed: ${task.exception?.message}", Toast.LENGTH_LONG).show()
+                        }
                     }
                 }
         }
