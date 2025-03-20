@@ -36,11 +36,6 @@ interface PostDao {
         editedTimestamp: Long = System.currentTimeMillis()
     )
 
-    @Query("UPDATE posts SET likes = likes + :increment WHERE postId = :postId")
-    suspend fun updateLikes(postId: String, increment: Int)
-
-    @Query("UPDATE posts SET commentsCount = commentsCount + :increment WHERE postId = :postId")
-    suspend fun updateCommentsCount(postId: String, increment: Int)
 
     @Query("DELETE FROM posts WHERE postId = :postId")
     suspend fun deletePost(postId: String)
@@ -48,17 +43,11 @@ interface PostDao {
     @Query("SELECT * FROM posts WHERE userId IN (:userIds)")
     fun getPostsByUsers(userIds: List<String>): LiveData<List<Post>>
 
-    @Query("SELECT followingId FROM follows WHERE userId = :userId")
-    suspend fun getFollowingUserIds(userId: String): List<String>
-
-    @Query("SELECT * FROM posts ORDER BY likes DESC LIMIT 20")
-    fun getPopularPosts(): LiveData<List<Post>>
 
     @Query("SELECT * FROM posts ORDER BY timestamp DESC")
     suspend fun getAllPostsSync(): List<Post>
 
-    @Query("SELECT * FROM posts WHERE caption LIKE '%' || :query || '%' OR category LIKE '%' || :query || '%' ORDER BY timestamp DESC")
-    fun searchPosts(query: String): LiveData<List<Post>>
+
 
 
 }

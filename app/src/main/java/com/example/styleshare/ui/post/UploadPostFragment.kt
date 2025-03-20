@@ -242,7 +242,7 @@ class UploadPostFragment : BaseFragment() {
         }
 
         val uploadSuccess: (String) -> Unit = { uploadedImageUrl ->
-            savePostToFirestore(uploadedImageUrl, caption, category, items, isDraft)
+            savePostToFirestore(uploadedImageUrl, caption, category, items)
         }
 
         val uploadError: (String) -> Unit = { errorMessage ->
@@ -284,8 +284,7 @@ class UploadPostFragment : BaseFragment() {
         imageUrl: String,
         caption: String,
         category: String,
-        items: List<String>,
-        isDraft: Boolean
+        items: List<String>
     ) {
         val postId = UUID.randomUUID().toString()
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
@@ -297,16 +296,14 @@ class UploadPostFragment : BaseFragment() {
             "caption" to caption,
             "category" to category,
             "timestamp" to System.currentTimeMillis(),
-            "likes" to 0,
-            "commentsCount" to 0,
-            "items" to items,
-            "isDraft" to isDraft
+            "items" to items
+
         )
 
         FirebaseFirestore.getInstance().collection("posts").document(postId)
             .set(postData)
             .addOnSuccessListener {
-                savePostToRoom(postId, userId, imageUrl, caption, category, items, isDraft)
+                savePostToRoom(postId, userId, imageUrl, caption, category, items)
             }
             .addOnFailureListener { error ->
                 Log.e("FirestoreError", "Failed to save post: ${error.message}")
@@ -321,25 +318,32 @@ class UploadPostFragment : BaseFragment() {
         imageUrl: String,
         caption: String,
         category: String,
-        items: List<String>,
-        isDraft: Boolean
+        items: List<String>
     ) {
-        val post = Post(
-            postId = postId,
-            userId = userId,
-            imageUrl = imageUrl,
-            caption = caption,
-            category = category,
-            timestamp = System.currentTimeMillis(),
-            likedBy = emptyList(),
-            commentsCount = 0,
-            items = items,
-            isDraft = isDraft
-        )
-        postViewModel.insertPost(post)
-        Toast.makeText(requireContext(), "Post uploaded successfully!", Toast.LENGTH_SHORT).show()
-        findNavController().navigateUp()
+        lifecycleScope.launch {
+            val userExists = AppDatabase.getDatabase(requireContext()).userDao().doesUserExist(userId) > 0
+
+            if (!userExists) {
+                Toast.makeText(requireContext(), "משתמש לא קיים במסד המקומי", Toast.LENGTH_SHORT).show()
+                return@launch
+            }
+
+            val post = Post(
+                postId = postId,
+                userId = userId,
+                imageUrl = imageUrl,
+                caption = caption,
+                category = category,
+                timestamp = System.currentTimeMillis(),
+                items = items
+            )
+
+            postViewModel.insertPost(post)
+            Toast.makeText(requireContext(), "הפוסט הועלה בהצלחה!", Toast.LENGTH_SHORT).show()
+            findNavController().navigateUp()
+        }
     }
+
 
     override fun onDestroyView() {
         super.onDestroyView()

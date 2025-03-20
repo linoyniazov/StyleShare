@@ -32,22 +32,12 @@ class PostRepository(private val postDao: PostDao) {
         postDao.updatePost(postId, caption, category, editedTimestamp)
     }
 
-    suspend fun updateLikes(postId: String, increment: Int) {
-        postDao.updateLikes(postId, increment)
-    }
-
-    suspend fun updateCommentsCount(postId: String, increment: Int) {
-        postDao.updateCommentsCount(postId, increment)
-    }
 
     suspend fun deletePost(postId: String) {
         postDao.deletePost(postId)
     }
     fun getFollowingPosts(followedUserIds: List<String>): LiveData<List<Post>> {
         return postDao.getPostsByUsers(followedUserIds)
-    }
-    fun searchPosts(query: String): LiveData<List<Post>> {
-        return postDao.searchPosts(query)
     }
 
 

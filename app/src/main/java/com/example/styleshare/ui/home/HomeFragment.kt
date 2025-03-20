@@ -6,20 +6,27 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import com.example.styleshare.adapters.HomePagerAdapter
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.styleshare.databinding.FragmentHomeBinding
-import androidx.viewpager2.widget.ViewPager2
 import com.example.styleshare.viewmodel.HomeViewModel
+import com.example.styleshare.adapters.PostAdapter
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.google.android.material.tabs.TabLayoutMediator
 import com.example.styleshare.R
+import com.example.styleshare.repository.HomeRepository
+import com.example.styleshare.model.AppDatabase
+
 
 class HomeFragment : Fragment() {
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
 
-    // יצירת ViewModel בלי Hilt
-    private val homeViewModel: HomeViewModel by viewModels()
+    private val homeViewModel: HomeViewModel by viewModels {
+        HomeViewModel.HomeViewModelFactory(
+            HomeRepository(AppDatabase.getDatabase(requireContext()).postDao())
+        )
+    }
+
+    private lateinit var postAdapter: PostAdapter
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
@@ -33,24 +40,24 @@ class HomeFragment : Fragment() {
         binding.toolbar.navigationIcon = null
         binding.toolbar.title = "StyleShare"
 
-        // הגדרת Adapter עבור ה-Tabs
-        val adapter = HomePagerAdapter(this)
-        binding.viewPager.adapter = adapter
-        binding.viewPager.orientation = ViewPager2.ORIENTATION_HORIZONTAL
+        // הגדרת האדפטר וה-RecyclerView
+        postAdapter = PostAdapter { post ->
+            // פעולה בלחיצה על פוסט (אם תרצי לפתוח מסך פרטים או עריכה)
+        }
 
-        // חיבור ה-Tabs ל-ViewPager
-        TabLayoutMediator(binding.tabLayout, binding.viewPager) { tab, position ->
-            tab.text = when (position) {
-                0 -> "For You"
-                1 -> "Following"
-                else -> null
-            }
-        }.attach()
+        binding.recyclerView.apply {
+            adapter = postAdapter
+            layoutManager = LinearLayoutManager(requireContext())
+        }
+
+        // צפייה בנתוני הפוסטים מה-ViewModel
+        homeViewModel.allPosts.observe(viewLifecycleOwner) { posts ->
+            postAdapter.submitList(posts)
+        }
     }
 
     override fun onResume() {
         super.onResume()
-        // לוודא שה-Navbar לא נעלם
         requireActivity().findViewById<BottomNavigationView>(R.id.bottomNavigation).visibility = View.VISIBLE
     }
 

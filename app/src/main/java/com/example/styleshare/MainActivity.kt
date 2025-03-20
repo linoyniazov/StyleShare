@@ -19,7 +19,7 @@ class MainActivity : AppCompatActivity() {
 
     // ✅ פתרון - יצירת ה-ViewModel בצורה נכונה
     private val database by lazy { AppDatabase.getDatabase(this) }
-    private val repository by lazy { HomeRepository(database.postDao(), database.followDao()) }
+    private val repository by lazy { HomeRepository(database.postDao())}
     private val factory by lazy { HomeViewModel.HomeViewModelFactory(repository) }
     private val homeViewModel: HomeViewModel by viewModels { factory }
 
@@ -42,21 +42,9 @@ class MainActivity : AppCompatActivity() {
                     }
                     true
                 }
-                R.id.searchFragment -> {
-                    if (currentDestination != R.id.searchFragment) {
-                        navController.navigate(R.id.searchFragment)
-                    }
-                    true
-                }
                 R.id.addPostFragment -> {
                     if (currentDestination != R.id.uploadPostFragment) {
                         navController.navigate(R.id.uploadPostFragment)
-                    }
-                    true
-                }
-                R.id.likesFragment -> {
-                    if (currentDestination != R.id.likesFragment) {
-                        navController.navigate(R.id.likesFragment)
                     }
                     true
                 }
