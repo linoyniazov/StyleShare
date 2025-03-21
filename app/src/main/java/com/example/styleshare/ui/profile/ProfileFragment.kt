@@ -44,6 +44,12 @@ class ProfileFragment : Fragment() {
         setupRecyclerView()
         setupListeners()
         loadUserData()
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            if (destination.id == R.id.profileFragment) {
+                loadUserData()
+            }
+        }
+
         loadPostCount()
     }
 
@@ -86,6 +92,9 @@ class ProfileFragment : Fragment() {
         // ✅ מאזינים לשם המשתמש
         profileViewModel.username.observe(viewLifecycleOwner) { username ->
             binding.username.text = "@$username"
+        }
+        profileViewModel.bio.observe(viewLifecycleOwner) { bio ->
+            binding.userBio.text = bio // ✅ ודאי שה-ID נכון
         }
 
         // ✅ מאזינים לתמונת פרופיל מ-Cloudinary
