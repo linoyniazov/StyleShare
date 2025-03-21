@@ -12,6 +12,13 @@ import com.bumptech.glide.Glide
 import com.example.styleshare.databinding.FragmentEditProfileBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import android.net.Uri
+import android.util.Log
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.lifecycle.lifecycleScope
+import com.example.styleshare.model.CloudinaryModel
+import kotlinx.coroutines.launch
+import com.example.styleshare.R
 
 class EditProfileFragment : Fragment() {
 
@@ -19,7 +26,14 @@ class EditProfileFragment : Fragment() {
     private val binding get() = _binding!!
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
     private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
-    private var userId: String? = null
+    private var selectedImageUri: Uri? = null
+    private val pickImageLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+        uri?.let {
+            selectedImageUri = it
+            binding.profileImage.setImageURI(it) // מציגים את התמונה במסך העריכה
+            uploadProfileImageToCloudinary(it) // מעלה את התמונה ל-Cloudinary
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -31,20 +45,27 @@ class EditProfileFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        userId = auth.currentUser?.uid
+        val userId = auth.currentUser?.uid
         userId?.let { loadUserData(it) }
 
         binding.btnBack.setOnClickListener {
-            findNavController().navigateUp()
+            try {
+                if (isAdded) {
+                    findNavController().popBackStack()
+                }
+            } catch (e: Exception) {
+                Log.e("EditProfileFragment", "Navigation error on back press", e)
+            }
         }
+
+
 
         binding.btnSave.setOnClickListener {
             saveUserProfile()
         }
 
         binding.btnChangePhoto.setOnClickListener {
-            Toast.makeText(requireContext(), "Profile photo update not implemented", Toast.LENGTH_SHORT).show()
-            // TODO: Implement photo upload functionality
+            pickImageLauncher.launch("image/*")
         }
     }
 
@@ -87,16 +108,69 @@ class EditProfileFragment : Fragment() {
             "bio" to bio
         )
 
-        userId?.let {
-            firestore.collection("users").document(it).update(userUpdates as Map<String, Any>)
-                .addOnSuccessListener {
+        val userId = auth.currentUser?.uid ?: return
+
+        firestore.collection("users").document(userId).update(userUpdates as Map<String, Any>)
+            .addOnSuccessListener {
+                if (isAdded) {
                     Toast.makeText(requireContext(), "Profile updated successfully!", Toast.LENGTH_SHORT).show()
-                    findNavController().navigateUp() // חזרה למסך הקודם
+
+                    // ✅ עיכוב קצר כדי לוודא שהפרגמנט לא קורס לפני הניווט
+                    view?.postDelayed({
+                        try {
+                            findNavController().navigate(R.id.action_editProfileFragment_to_profileFragment)
+                        } catch (e: Exception) {
+                            Log.e("EditProfileFragment", "Navigation error: ${e.message}")
+                        }
+                    }, 100) // 100 מילישניות
                 }
-                .addOnFailureListener {
-                    Toast.makeText(requireContext(), "Failed to update profile", Toast.LENGTH_SHORT).show()
+            }
+            .addOnFailureListener { e ->
+                if (isAdded) {
+                    Toast.makeText(requireContext(), "Failed to update profile: ${e.message}", Toast.LENGTH_SHORT).show()
+                    Log.e("EditProfileFragment", "Firestore update failed", e)
                 }
+            }
+    }
+
+
+
+
+
+    private fun uploadProfileImageToCloudinary(imageUri: Uri) {
+        val userId = auth.currentUser?.uid ?: return
+
+        lifecycleScope.launch {
+            try {
+                val imageUrl = CloudinaryModel.uploadImageFromUri(requireContext(), imageUri, "profile_pictures")
+                if (!imageUrl.isNullOrEmpty()) {
+                    saveProfileImageUrlToDatabase(imageUrl)
+                } else {
+                    if (isAdded) {
+                        Toast.makeText(requireContext(), "Failed to upload image", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            } catch (e: Exception) {
+                if (isAdded) {
+                    Log.e("EditProfileFragment", "Error uploading image", e)
+                    Toast.makeText(requireContext(), "Upload failed: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+            }
         }
+    }
+
+
+    private fun saveProfileImageUrlToDatabase(imageUrl: String) {
+        val userId = auth.currentUser?.uid ?: return
+        val userRef = firestore.collection("users").document(userId)
+
+        userRef.update("profileImageUrl", imageUrl)
+            .addOnSuccessListener {
+                Toast.makeText(requireContext(), "Profile image updated!", Toast.LENGTH_SHORT).show()
+            }
+            .addOnFailureListener {
+                Toast.makeText(requireContext(), "Failed to save profile image", Toast.LENGTH_SHORT).show()
+            }
     }
 
     override fun onDestroyView() {
