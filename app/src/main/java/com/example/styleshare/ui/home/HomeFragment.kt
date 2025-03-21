@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.styleshare.databinding.FragmentHomeBinding
@@ -11,12 +12,9 @@ import com.example.styleshare.viewmodel.PostViewModel
 import com.example.styleshare.adapters.PostsAdapter
 import com.example.styleshare.model.AppDatabase
 import com.example.styleshare.repository.PostRepository
-import com.example.styleshare.ui.BaseFragment
 
-class HomeFragment : BaseFragment() {
-    override val showToolbar: Boolean = false
-    override val showBottomNav: Boolean = true
-    override val showBackButton: Boolean = false
+class HomeFragment : Fragment() {
+
 
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!

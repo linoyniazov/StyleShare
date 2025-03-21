@@ -30,17 +30,6 @@ class AuthRepository {
     }
 
 
-    //    suspend fun loginUser(email: String, password: String): Result<FirebaseUser> {
-//        Log.d("AuthRepository", "🔄 loginUser() called with email: $email")
-//        return try {
-//            val result = firebaseAuth.signInWithEmailAndPassword(email, password).await()
-//            Log.d("AuthRepository", "✅ User logged in: ${result.user?.email}")
-//            Result.success(result.user!!)
-//        } catch (e: Exception) {
-//            Log.e("AuthRepository", "❌ Login failed: ${e.message}", e)
-//            Result.failure(e)
-//        }
-//    }
     suspend fun loginUser(email: String, password: String): Result<FirebaseUser> {
         Log.d("AuthRepository", "🔄 loginUser() called with email: $email")
         return try {

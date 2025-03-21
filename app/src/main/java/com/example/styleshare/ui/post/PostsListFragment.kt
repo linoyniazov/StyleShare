@@ -4,19 +4,18 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.styleshare.adapters.PostsAdapter
 import com.example.styleshare.databinding.FragmentPostsListBinding
 import com.example.styleshare.model.AppDatabase
 import com.example.styleshare.repository.PostRepository
-import com.example.styleshare.ui.BaseFragment
+
 import com.example.styleshare.viewmodel.PostViewModel
 
-class PostsListFragment : BaseFragment() {
-    override val showToolbar: Boolean = true
-    override val showBottomNav: Boolean = true
-    override val showBackButton: Boolean = false
+class PostsListFragment : Fragment() {
+
 
     private var _binding: FragmentPostsListBinding? = null
     private val binding get() = _binding!!

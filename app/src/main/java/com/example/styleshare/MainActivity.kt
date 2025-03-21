@@ -10,16 +10,14 @@ import com.example.styleshare.databinding.ActivityMainBinding
 import com.example.styleshare.model.AppDatabase
 import com.example.styleshare.repository.HomeRepository
 import com.example.styleshare.viewmodel.HomeViewModel
-import com.example.styleshare.viewmodel.HomeViewModel.HomeViewModelFactory
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var navController: NavController
     private lateinit var binding: ActivityMainBinding
 
-    // ✅ פתרון - יצירת ה-ViewModel בצורה נכונה
     private val database by lazy { AppDatabase.getDatabase(this) }
-    private val repository by lazy { HomeRepository(database.postDao())}
+    private val repository by lazy { HomeRepository(database.postDao()) }
     private val factory by lazy { HomeViewModel.HomeViewModelFactory(repository) }
     private val homeViewModel: HomeViewModel by viewModels { factory }
 
@@ -32,7 +30,12 @@ class MainActivity : AppCompatActivity() {
             .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         navController = navHostFragment.navController
 
-        // Connect bottom navigation with NavController
+        // ✅ מאזינים לשינויים בנווט ומעדכנים את ה-Bottom Navigation בהתאם
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            updateNavigationVisibility(destination.id)
+        }
+
+        // ✅ חיבור ה-Bottom Navigation לניווט
         binding.bottomNavigation.setOnItemSelectedListener { item ->
             val currentDestination = navController.currentDestination?.id
             when (item.itemId) {
@@ -59,14 +62,18 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun updateNavigationVisibility(showToolbar: Boolean, showBottomNav: Boolean) {
-        binding.toolbar.root.visibility = if (showToolbar) View.VISIBLE else View.GONE
-        binding.bottomNavigation.visibility = if (showBottomNav) View.VISIBLE else View.GONE
-    }
+    /**
+     * ✅ פונקציה לעדכון הניווט בהתאם למסך הפעיל
+     */
+    fun updateNavigationVisibility(destinationId: Int) {
+        val hideBottomNavScreens = setOf(
+            R.id.uploadPostFragment,
+            R.id.welcomeFragment,
+            R.id.loginFragment,
+            R.id.registerEmailFragment,
+            R.id.registerPasswordFragment
+        )
 
-    override fun onResume() {
-        super.onResume()
-        updateNavigationVisibility(true, true) // Default: Show both toolbar and bottom nav
+        binding.bottomNavigation.visibility = if (destinationId in hideBottomNavScreens) View.GONE else View.VISIBLE
     }
 }
-

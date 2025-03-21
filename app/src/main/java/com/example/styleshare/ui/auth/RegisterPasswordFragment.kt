@@ -13,23 +13,19 @@ import com.example.styleshare.databinding.FragmentRegisterPasswordBinding
 import com.example.styleshare.model.AppDatabase
 import com.example.styleshare.model.entities.User
 import com.example.styleshare.repository.UserRepository
-import com.example.styleshare.ui.BaseFragment
 import com.example.styleshare.viewmodel.UserViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import androidx.fragment.app.Fragment
 
-class RegisterPasswordFragment : BaseFragment() {
 
-    override val showToolbar: Boolean = true
-    override val showBottomNav: Boolean = false
-    override val showBackButton: Boolean = true
+class RegisterPasswordFragment : Fragment() {
 
     private val userViewModel: UserViewModel by viewModels {
         UserViewModel.UserViewModelFactory(
             UserRepository(AppDatabase.getDatabase(requireContext()).userDao())
         )
     }
-
     private var _binding: FragmentRegisterPasswordBinding? = null
     private val binding get() = _binding!!
     private val args: RegisterPasswordFragmentArgs by navArgs()
