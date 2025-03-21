@@ -13,6 +13,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -22,7 +23,6 @@ import com.example.styleshare.model.AppDatabase
 import com.example.styleshare.model.CloudinaryModel
 import com.example.styleshare.model.entities.Post
 import com.example.styleshare.repository.PostRepository
-import com.example.styleshare.ui.BaseFragment
 import com.example.styleshare.viewmodel.PostViewModel
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.chip.Chip
@@ -32,10 +32,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.launch
 import java.util.*
 
-class UploadPostFragment : BaseFragment() {
-    override val showToolbar: Boolean = true
-    override val showBottomNav: Boolean = false
-    override val showBackButton: Boolean = true
+class UploadPostFragment : Fragment() {
 
     private var _binding: FragmentUploadPostBinding? = null
     private val binding get() = _binding!!
