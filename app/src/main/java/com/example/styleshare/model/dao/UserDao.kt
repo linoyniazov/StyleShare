@@ -22,7 +22,6 @@ interface UserDao {
         UPDATE users 
         SET username = :username,
             email = :email,
-            fullName = :fullName,
             profileImageUrl = :profileImageUrl,
             bio = :bio,
             postsCount = :postsCount
@@ -32,7 +31,6 @@ interface UserDao {
         id: String,
         username: String,
         email: String,
-        fullName: String,
         profileImageUrl: String,
         bio: String,
         postsCount: Int

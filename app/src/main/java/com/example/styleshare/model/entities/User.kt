@@ -9,7 +9,6 @@ data class User(
     @PrimaryKey val userId: String,
     val username: String,
     val email: String,
-    val fullName: String,
     val profileImageUrl: String,
     val bio: String,
     val postsCount: Int = 0

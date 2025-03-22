@@ -22,7 +22,6 @@ class UserRepository(private val userDao: UserDao) {
         id: String,
         username: String,
         email: String,
-        fullName: String,
         profileImageUrl: String,
         bio: String,
         postsCount: Int
@@ -31,7 +30,6 @@ class UserRepository(private val userDao: UserDao) {
             id,
             username,
             email,
-            fullName,
             profileImageUrl,
             bio,
             postsCount,

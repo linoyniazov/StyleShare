@@ -44,16 +44,9 @@ class ProfileFragment : Fragment() {
         setupRecyclerView()
         setupListeners()
         loadUserData()
-        navController.addOnDestinationChangedListener { _, destination, _ ->
-            if (destination.id == R.id.profileFragment) {
-                loadUserData()
-            }
-        }
-
         loadPostCount()
     }
 
-    // ✅ מאזין ללחיצות כפתורים
     private fun setupListeners() {
         binding.btnEditProfile.setOnClickListener {
             navController.navigate(R.id.action_profileFragment_to_editProfileFragment)
@@ -74,7 +67,7 @@ class ProfileFragment : Fragment() {
             .whereEqualTo("userId", userId)
             .get()
             .addOnSuccessListener { documents ->
-                if (isAdded) { // ✅ מונע קריסה אם ה-Fragment כבר לא מחובר
+                if (isAdded) {
                     binding.postCount.text = documents.size().toString()
                 }
             }
@@ -89,26 +82,26 @@ class ProfileFragment : Fragment() {
         profileViewModel.loadUserProfile(userId)
         profileViewModel.loadUserPosts(userId)
 
-        // ✅ מאזינים לשם המשתמש
-        profileViewModel.username.observe(viewLifecycleOwner) { username ->
-            binding.username.text = "@$username"
-        }
-        profileViewModel.bio.observe(viewLifecycleOwner) { bio ->
-            binding.userBio.text = bio // ✅ ודאי שה-ID נכון
-        }
-
-        // ✅ מאזינים לתמונת פרופיל מ-Cloudinary
-        profileViewModel.profileImage.observe(viewLifecycleOwner) { imageUrl ->
-            if (!imageUrl.isNullOrEmpty() && isAdded) {
-                Glide.with(requireContext())
-                    .load(imageUrl)
-                    .into(binding.profileImage)
+        viewLifecycleOwnerLiveData.observe(viewLifecycleOwner) { lifecycleOwner ->
+            profileViewModel.username.observe(lifecycleOwner) { username ->
+                binding.username.text = "@$username"
             }
-        }
 
-        // ✅ מאזינים לרשימת הפוסטים של המשתמש
-        profileViewModel.userPosts.observe(viewLifecycleOwner) { posts ->
-            postsAdapter.submitList(posts)
+            profileViewModel.bio.observe(lifecycleOwner) { bio ->
+                binding.userBio.text = bio
+            }
+
+            profileViewModel.profileImage.observe(lifecycleOwner) { imageUrl ->
+                if (!imageUrl.isNullOrEmpty() && isAdded) {
+                    Glide.with(requireContext())
+                        .load(imageUrl)
+                        .into(binding.profileImage)
+                }
+            }
+
+            profileViewModel.userPosts.observe(lifecycleOwner) { posts ->
+                postsAdapter.submitList(posts)
+            }
         }
     }
 

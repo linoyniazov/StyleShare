@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -16,8 +17,6 @@ import com.example.styleshare.repository.UserRepository
 import com.example.styleshare.viewmodel.UserViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import androidx.fragment.app.Fragment
-
 
 class RegisterPasswordFragment : Fragment() {
 
@@ -84,10 +83,9 @@ class RegisterPasswordFragment : Fragment() {
     private fun registerUserWithEmailAndSave(password: String) {
         val email = args.email
         val username = args.username
-        val fullName = args.fullName
         val profileImageUrl = args.profileImageUrl ?: ""
 
-        if (email.isNullOrEmpty() || username.isNullOrEmpty() || fullName.isNullOrEmpty()) {
+        if (email.isNullOrEmpty() || username.isNullOrEmpty()) {
             Toast.makeText(requireContext(), "Missing registration data", Toast.LENGTH_LONG).show()
             return
         }
@@ -102,7 +100,6 @@ class RegisterPasswordFragment : Fragment() {
                         userId = userId,
                         username = username,
                         email = email,
-                        fullName = fullName,
                         profileImageUrl = profileImageUrl,
                         bio = ""
                     )
