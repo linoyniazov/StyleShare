@@ -1,252 +1,261 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:fillViewport="true">
+    android:layout_height="match_parent">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <!-- Back Button Container - Fixed at the top -->
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp">
+        android:background="@android:color/white"
+        android:elevation="4dp">
 
+        <ImageButton
+            android:id="@+id/backButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_margin="16dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Back"
+            android:src="@drawable/ic_arrow_back"
+            app:tint="@android:color/black" />
+    </FrameLayout>
 
-        <com.google.android.material.appbar.MaterialToolbar
-            android:id="@+id/toolbar"
-            style="@style/Widget.MaterialComponents.Toolbar.Surface"
-            android:layout_width="wrap_content"
-            android:layout_height="?attr/actionBarSize"
-            android:layout_marginTop="28dp"
-            app:layout_constraintBottom_toTopOf="@+id/postImage"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:title="New post" />
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="64dp"
+        android:fillViewport="true">
 
-        <ImageView
-            android:id="@+id/postImage"
-            android:layout_width="match_parent"
-            android:layout_height="400dp"
-            android:layout_marginTop="16dp"
-            android:scaleType="centerCrop"
-            android:src="@drawable/placeholder_image"
-            app:layout_constraintTop_toBottomOf="@id/toolbar"
-            android:contentDescription="Post image preview"/>
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/captionInputLayout"
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:hint="Write a caption about your look...."
-            app:boxStrokeColor="@color/black"
-            app:boxStrokeWidth="2dp"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            app:layout_constraintTop_toBottomOf="@id/postImage">
+            android:padding="16dp">
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/captionEditText"
+            <com.google.android.material.appbar.MaterialToolbar
+                android:id="@+id/toolbar"
+                style="@style/Widget.MaterialComponents.Toolbar.Surface"
+                android:layout_width="wrap_content"
+                android:layout_height="?attr/actionBarSize"
+                android:layout_marginTop="28dp"
+                app:layout_constraintBottom_toTopOf="@+id/postImage"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:title="New post" />
+
+            <ImageView
+                android:id="@+id/postImage"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="textMultiLine"
-                android:minLines="3"/>
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <TextView
-            android:id="@+id/categoryLabel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Category"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:layout_marginTop="24dp"
-            app:layout_constraintTop_toBottomOf="@id/captionInputLayout"
-            app:layout_constraintStart_toStartOf="parent"/>
-
-        <com.google.android.material.chip.ChipGroup
-            android:id="@+id/categoryChipGroup"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            app:singleSelection="true"
-            app:selectionRequired="true"
-            app:layout_constraintTop_toBottomOf="@id/categoryLabel">
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chipCasual"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Casual"
-                style="@style/Widget.MaterialComponents.Chip.Filter"
-                app:chipBackgroundColor="@color/chip_background_color"
-                android:textStyle="normal"/>
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chipElegant"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Elegant"
-                style="@style/Widget.MaterialComponents.Chip.Filter"
-                app:chipBackgroundColor="@color/chip_background_color"
-                android:textStyle="normal"/>
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chipParty"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Party"
-                style="@style/Widget.MaterialComponents.Chip.Filter"
-                app:chipBackgroundColor="@color/chip_background_color"
-                android:textStyle="normal"/>
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chipFormal"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Formal"
-                style="@style/Widget.MaterialComponents.Chip.Filter"
-                app:chipBackgroundColor="@color/chip_background_color"
-                android:textStyle="normal"/>
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chipEvening"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Evening"
-                style="@style/Widget.MaterialComponents.Chip.Filter"
-                app:chipBackgroundColor="@color/chip_background_color"
-                android:textStyle="normal"/>
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chipOther"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Other"
-                style="@style/Widget.MaterialComponents.Chip.Filter"
-                app:chipBackgroundColor="@color/chip_background_color"
-                android:textStyle="normal"/>
-        </com.google.android.material.chip.ChipGroup>
-
-        <!-- Custom category input layout -->
-        <LinearLayout
-            android:id="@+id/customCategoryLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:visibility="gone"
-            android:layout_marginTop="8dp"
-            app:layout_constraintTop_toBottomOf="@id/categoryChipGroup">
+                android:layout_height="400dp"
+                android:layout_marginTop="16dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/placeholder_image"
+                app:layout_constraintTop_toBottomOf="@id/toolbar"
+                android:contentDescription="Post image preview"/>
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/customCategoryInputLayout"
+                android:id="@+id/captionInputLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Enter custom category"
-                android:textColorHint="@color/light_gray"
-                app:boxStrokeColor="@color/light_gray"
+                android:layout_marginTop="16dp"
+                android:hint="Write a caption about your look...."
+                app:boxStrokeColor="@color/black"
                 app:boxStrokeWidth="2dp"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                app:layout_constraintTop_toBottomOf="@id/postImage">
 
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/customCategoryEditText"
+                    android:id="@+id/captionEditText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="text"/>
-
+                    android:inputType="textMultiLine"
+                    android:minLines="3"/>
             </com.google.android.material.textfield.TextInputLayout>
 
-            <LinearLayout
+            <TextView
+                android:id="@+id/categoryLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Category"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_marginTop="24dp"
+                app:layout_constraintTop_toBottomOf="@id/captionInputLayout"
+                app:layout_constraintStart_toStartOf="parent"/>
+
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/categoryChipGroup"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginTop="8dp">
+                android:layout_marginTop="8dp"
+                app:singleSelection="true"
+                app:selectionRequired="true"
+                app:layout_constraintTop_toBottomOf="@id/categoryLabel">
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/confirmCategoryButton"
-                    android:layout_width="0dp"
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chipCasual"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Confirm"
+                    android:text="Casual"
+                    style="@style/Widget.MaterialComponents.Chip.Filter"
+                    app:chipBackgroundColor="@color/chip_background_color"
+                    android:textStyle="normal"/>
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chipElegant"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Elegant"
+                    style="@style/Widget.MaterialComponents.Chip.Filter"
+                    app:chipBackgroundColor="@color/chip_background_color"
+                    android:textStyle="normal"/>
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chipParty"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Party"
+                    style="@style/Widget.MaterialComponents.Chip.Filter"
+                    app:chipBackgroundColor="@color/chip_background_color"
+                    android:textStyle="normal"/>
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chipFormal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Formal"
+                    style="@style/Widget.MaterialComponents.Chip.Filter"
+                    app:chipBackgroundColor="@color/chip_background_color"
+                    android:textStyle="normal"/>
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chipEvening"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Evening"
+                    style="@style/Widget.MaterialComponents.Chip.Filter"
+                    app:chipBackgroundColor="@color/chip_background_color"
+                    android:textStyle="normal"/>
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chipOther"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Other"
+                    style="@style/Widget.MaterialComponents.Chip.Filter"
+                    app:chipBackgroundColor="@color/chip_background_color"
+                    android:textStyle="normal"/>
+            </com.google.android.material.chip.ChipGroup>
+
+            <!-- Custom category input layout -->
+            <LinearLayout
+                android:id="@+id/customCategoryLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone"
+                android:layout_marginTop="8dp"
+                app:layout_constraintTop_toBottomOf="@id/categoryChipGroup">
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/customCategoryInputLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Enter custom category"
+                    android:textColorHint="@color/light_gray"
                     app:boxStrokeColor="@color/light_gray"
                     app:boxStrokeWidth="2dp"
-                    android:textColor="@color/black"
-                    android:layout_marginEnd="4dp"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/cancelCategoryButton"
-                    android:layout_width="0dp"
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/customCategoryEditText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="text"/>
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Cancel"
-                    app:boxStrokeColor="@color/light_gray"
-                    app:boxStrokeWidth="2dp"
-                    android:textColor="@color/black"
-                    android:layout_marginStart="4dp"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
+                    android:orientation="horizontal"
+                    android:layout_marginTop="8dp">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/confirmCategoryButton"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Confirm"
+                        app:boxStrokeColor="@color/light_gray"
+                        app:boxStrokeWidth="2dp"
+                        android:textColor="@color/black"
+                        android:layout_marginEnd="4dp"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/cancelCategoryButton"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Cancel"
+                        app:boxStrokeColor="@color/light_gray"
+                        app:boxStrokeWidth="2dp"
+                        android:textColor="@color/black"
+                        android:layout_marginStart="4dp"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
+                </LinearLayout>
             </LinearLayout>
-        </LinearLayout>
 
-        <TextView
-            android:id="@+id/itemsLabel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Items"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:layout_marginTop="24dp"
-            app:layout_constraintTop_toBottomOf="@id/customCategoryLayout"
-            app:layout_constraintStart_toStartOf="parent"/>
+            <TextView
+                android:id="@+id/itemsLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Items"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_marginTop="24dp"
+                app:layout_constraintTop_toBottomOf="@id/customCategoryLayout"
+                app:layout_constraintStart_toStartOf="parent"/>
 
-        <!-- Container for dynamic item fields -->
-        <LinearLayout
-            android:id="@+id/dynamicItemsContainer"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_marginTop="8dp"
-            app:layout_constraintTop_toBottomOf="@id/itemsLabel"/>
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/addMoreItemButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Add Item"
-            android:textColor="@color/black"
-            android:layout_marginTop="16dp"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-            app:layout_constraintTop_toBottomOf="@id/dynamicItemsContainer"
-            app:layout_constraintStart_toStartOf="parent"/>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginTop="24dp"
-            app:layout_constraintTop_toBottomOf="@id/addMoreItemButton"
-            app:layout_constraintBottom_toBottomOf="parent"
-            android:layout_marginBottom="16dp">
+            <!-- Container for dynamic item fields -->
+            <LinearLayout
+                android:id="@+id/dynamicItemsContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginTop="8dp"
+                app:layout_constraintTop_toBottomOf="@id/itemsLabel"/>
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/saveDraftButton"
-                android:layout_width="0dp"
+                android:id="@+id/addMoreItemButton"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Save draft"
+                android:text="Add Item"
                 android:textColor="@color/black"
-                android:layout_marginEnd="8dp"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
+                android:layout_marginTop="16dp"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                app:layout_constraintTop_toBottomOf="@id/dynamicItemsContainer"
+                app:layout_constraintStart_toStartOf="parent"/>
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/postButton"
-                android:layout_width="0dp"
+                android:layout_width="200dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:text="Post"
                 android:textColor="@color/white"
                 android:backgroundTint="@color/black"
-                android:layout_marginStart="8dp"/>
-        </LinearLayout>
+                android:layout_marginTop="24dp"
+                android:layout_marginBottom="16dp"
+                app:layout_constraintTop_toBottomOf="@id/addMoreItemButton"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
-</ScrollView>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

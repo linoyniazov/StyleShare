@@ -82,6 +82,10 @@ class UploadPostFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        binding.backButton.setOnClickListener {
+            findNavController().navigateUp()
+        }
+
         setupChipGroupListeners()
         setupCustomCategoryHandlers()
 
@@ -95,10 +99,6 @@ class UploadPostFragment : Fragment() {
 
         binding.postButton.setOnClickListener {
             uploadPost(isDraft = false)
-        }
-
-        binding.saveDraftButton.setOnClickListener {
-            uploadPost(isDraft = true)
         }
     }
 
