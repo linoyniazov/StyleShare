@@ -45,7 +45,6 @@ class UserViewModel(private val repository: UserRepository) : ViewModel() {
         id: String,
         username: String,
         email: String,
-        fullName: String,
         profileImageUrl: String,
         bio: String,
         postsCount: Int
@@ -54,7 +53,6 @@ class UserViewModel(private val repository: UserRepository) : ViewModel() {
             id,
             username,
             email,
-            fullName,
             profileImageUrl,
             bio,
             postsCount
