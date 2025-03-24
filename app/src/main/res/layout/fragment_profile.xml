@@ -28,13 +28,29 @@
                     android:orientation="vertical"
                     android:padding="16dp">
 
+                    <!-- Top Bar with Logout -->
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="16dp">
+
+                        <ImageButton
+                            android:id="@+id/btnLogout"
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:layout_alignParentEnd="true"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:src="@drawable/ic_logout"
+                            android:color="@color/black"
+                            android:contentDescription="Logout" />
+                    </RelativeLayout>
+
                     <!-- Profile Picture -->
                     <de.hdodenhof.circleimageview.CircleImageView
                         android:id="@+id/profileImage"
                         android:layout_width="100dp"
                         android:layout_height="100dp"
                         android:layout_gravity="center_horizontal"
-                        android:layout_marginTop="16dp"
                         android:src="@drawable/default_profile" />
 
                     <!-- Stats -->
@@ -66,7 +82,6 @@
                                 android:text="Posts"
                                 android:textSize="14sp" />
                         </LinearLayout>
-
                     </LinearLayout>
 
                     <!-- Username -->
@@ -76,7 +91,7 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:layout_marginTop="16dp"
-                        android:text="\@Anacaroline"
+                        android:text="\@Username"
                         android:textSize="16sp"
                         android:textStyle="bold" />
 
