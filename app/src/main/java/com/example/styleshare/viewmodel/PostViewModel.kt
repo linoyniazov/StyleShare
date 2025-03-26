@@ -39,6 +39,10 @@ class PostViewModel(private val repository: PostRepository) : ViewModel() {
     fun syncPostsFromFirestore() = viewModelScope.launch {
         repository.syncPostsFromFirestore()
     }
+//    fun updateFullPost(post: Post) = viewModelScope.launch {
+//        repository.updatePostInFirestoreAndRoom(post)
+//    }
+
 
     class PostViewModelFactory(private val repository: PostRepository) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {

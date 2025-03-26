@@ -45,7 +45,10 @@ class HomeFragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
-        postAdapter = PostsAdapter()
+        postAdapter = PostsAdapter(
+            onEditClick = { /* אפשר להשאיר ריק או להראות הודעה */ },
+            onDeleteClick = { /* כנ"ל */ }
+        )
         binding.recyclerView.apply {
             adapter = postAdapter
             layoutManager = LinearLayoutManager(requireContext())

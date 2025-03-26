@@ -31,11 +31,16 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.launch
 import java.util.*
+import com.bumptech.glide.Glide
+
 
 class UploadPostFragment : Fragment() {
 
     private var _binding: FragmentUploadPostBinding? = null
     private val binding get() = _binding!!
+    private var editingPostId: String? = null
+    private var originalImageUrl: String? = null
+
 
     private val postViewModel: PostViewModel by viewModels {
         PostViewModel.PostViewModelFactory(PostRepository(AppDatabase.getDatabase(requireContext()).postDao()))
@@ -83,11 +88,56 @@ class UploadPostFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.backButton.setOnClickListener {
+            // This will pop the current fragment and return to the previous one
             findNavController().navigateUp()
+        }
+        binding.postButton.apply {
+            visibility = View.VISIBLE
+            bringToFront() // Ensure it's on top of other views
         }
 
         setupChipGroupListeners()
         setupCustomCategoryHandlers()
+
+        val postId = arguments?.getString("postId")
+        if (postId != null) {
+            // מצב עריכה
+            FirebaseFirestore.getInstance().collection("posts").document(postId).get()
+                .addOnSuccessListener { document ->
+                    if (document != null && document.exists()) {
+                        val post = Post(
+                            postId = document.getString("postId") ?: "",
+                            userId = document.getString("userId") ?: "",
+                            username = document.getString("username") ?: "",
+                            imageUrl = document.getString("imageUrl") ?: "",
+                            caption = document.getString("caption") ?: "",
+                            category = document.getString("category") ?: "",
+                            timestamp = document.getLong("timestamp") ?: System.currentTimeMillis(),
+                            items = (document.get("items") as? List<*>)?.filterIsInstance<String>()
+                                ?: emptyList()
+                        )
+
+                        binding.captionEditText.setText(post.caption)
+                        loadCategoryIntoChip(post.category)
+                        loadItemsIntoViews(post.items)
+                        Glide.with(this).load(post.imageUrl).into(binding.postImage)
+
+                        originalImageUrl = post.imageUrl
+                        editingPostId = post.postId
+
+                        binding.postButton.text = "Update"
+
+                    } else {
+                        Toast.makeText(requireContext(), "הפוסט לא נמצא", Toast.LENGTH_SHORT).show()
+                        findNavController().navigateUp()
+                    }
+                }
+                .addOnFailureListener {
+                    Toast.makeText(requireContext(), "שגיאה בטעינת הפוסט", Toast.LENGTH_SHORT)
+                        .show()
+                    findNavController().navigateUp()
+                }
+        }
 
         binding.postImage.setOnClickListener {
             showImagePickerOptions()
@@ -98,8 +148,77 @@ class UploadPostFragment : Fragment() {
         }
 
         binding.postButton.setOnClickListener {
-            uploadPost(isDraft = false)
+            val caption = binding.captionEditText.text.toString()
+            val category = getSelectedCategory()
+            val items = getItemsFromViews()
+
+            if (caption.isEmpty() || category.isEmpty() || items.isEmpty()) {
+                Toast.makeText(requireContext(), "יש למלא את כל השדות", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return@setOnClickListener
+
+            val onComplete: (String) -> Unit = { imageUrl ->
+                if (editingPostId != null) {
+                    updatePost(editingPostId!!)
+                } else {
+                    savePostToFirestore(imageUrl, caption, category, items)
+                }
+            }
+
+            val onError: (String) -> Unit = { error ->
+                Toast.makeText(requireContext(), "שגיאה בהעלאת תמונה: $error", Toast.LENGTH_SHORT)
+                    .show()
+            }
+
+            lifecycleScope.launch {
+                try {
+                    when {
+                        imageUri != null -> {
+                            val uploadedUrl =
+                                CloudinaryModel.uploadImageFromUri(requireContext(), imageUri!!)
+                            if (uploadedUrl != null) {
+                                onComplete(uploadedUrl)
+                            } else {
+                                onError("Image upload failed")
+                            }
+                        }
+
+                        imageBitmap != null -> {
+                            CloudinaryModel.uploadImageFromBitmap(
+                                bitmap = imageBitmap!!,
+                                context = requireContext(),
+                                onSuccess = onComplete,
+                                onError = onError
+                            )
+                        }
+
+                        else -> {
+                            originalImageUrl?.let { onComplete(it) }
+                                ?: onError("לא נבחרה תמונה")
+                        }
+                    }
+                } catch (e: Exception) {
+                    onError("Exception: ${e.message}")
+                }
+            }
         }
+    }
+
+    private fun loadCategoryIntoChip(category: String) {
+        val chip = when (category.lowercase()) {
+            "casual" -> binding.chipCasual
+            "elegant" -> binding.chipElegant
+            "party" -> binding.chipParty
+            "formal" -> binding.chipFormal
+            "evening" -> binding.chipEvening
+            else -> {
+                createCustomCategoryChip(category)
+                customCategoryChip
+            }
+        }
+        chip?.isChecked = true
     }
 
     private fun setupChipGroupListeners() {
@@ -126,6 +245,18 @@ class UploadPostFragment : Fragment() {
             }
         }
     }
+    private fun loadItemsIntoViews(items: List<String>) {
+        items.forEach { item ->
+            addNewItemFields()
+            val lastView = itemViews.last()
+            val parts = item.split(" - ")
+            if (parts.size == 3) {
+                lastView.findViewById<TextInputEditText>(R.id.itemNameInput).setText(parts[0])
+                lastView.findViewById<TextInputEditText>(R.id.shopBrandInput).setText(parts[1])
+                lastView.findViewById<TextInputEditText>(R.id.priceInput).setText(parts[2])
+            }
+        }
+    }
 
     private fun setupCustomCategoryHandlers() {
         binding.confirmCategoryButton.setOnClickListener {
@@ -141,6 +272,7 @@ class UploadPostFragment : Fragment() {
                 Toast.makeText(requireContext(), "Please enter a category name", Toast.LENGTH_SHORT).show()
             }
         }
+
 
         binding.cancelCategoryButton.setOnClickListener {
             hideCustomCategoryInput()
@@ -218,34 +350,83 @@ class UploadPostFragment : Fragment() {
         itemCount = itemViews.size
     }
 
-    private fun uploadPost(isDraft: Boolean) {
+    private fun updatePost(postId: String) {
         val caption = binding.captionEditText.text.toString()
         val category = getSelectedCategory()
         val items = getItemsFromViews()
 
-        if ((imageUri == null && imageBitmap == null) || caption.isEmpty() || category.isEmpty()) {
-            Toast.makeText(requireContext(), "Please select an image and enter details", Toast.LENGTH_SHORT).show()
+        if (caption.isEmpty() || category.isEmpty() || items.isEmpty()) {
+            Toast.makeText(requireContext(), "יש למלא את כל השדות", Toast.LENGTH_SHORT).show()
             return
         }
 
-        if (items.isEmpty()) {
-            Toast.makeText(requireContext(), "Please add at least one item", Toast.LENGTH_SHORT).show()
-            return
+        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+
+        val onComplete: (String) -> Unit = { imageUrl ->
+            // שליפת שם משתמש מה־Firestore לפי ה־userId
+            FirebaseFirestore.getInstance().collection("users").document(userId).get()
+                .addOnSuccessListener { document ->
+                    val username = document.getString("username") ?: "Unknown"
+
+                    val updatedPost = mapOf(
+                        "postId" to postId,
+                        "userId" to userId,
+                        "username" to username,
+                        "imageUrl" to imageUrl,
+                        "caption" to caption,
+                        "category" to category,
+                        "timestamp" to System.currentTimeMillis(),
+                        "items" to items
+                    )
+
+                    FirebaseFirestore.getInstance()
+                        .collection("posts")
+                        .document(postId)
+                        .set(updatedPost)
+                        .addOnSuccessListener {
+                            Toast.makeText(requireContext(), "הפוסט עודכן!", Toast.LENGTH_SHORT).show()
+                            findNavController().navigateUp()
+                        }
+                        .addOnFailureListener { e ->
+                            Toast.makeText(requireContext(), "שגיאה בעדכון הפוסט: ${e.message}", Toast.LENGTH_SHORT).show()
+                        }
+                }
+                .addOnFailureListener {
+                    Toast.makeText(requireContext(), "שגיאה בשליפת שם המשתמש", Toast.LENGTH_SHORT).show()
+                }
         }
 
-        val uploadSuccess: (String) -> Unit = { uploadedImageUrl ->
-            savePostToFirestore(uploadedImageUrl, caption, category, items)
+        val onError: (String) -> Unit = { error ->
+            Toast.makeText(requireContext(), "שגיאה בהעלאת תמונה: $error", Toast.LENGTH_SHORT).show()
         }
 
-        val uploadError: (String) -> Unit = { errorMessage ->
-            Toast.makeText(requireContext(), "Upload failed: $errorMessage", Toast.LENGTH_SHORT).show()
-        }
-
-        when {
-            imageUri != null -> lifecycleScope.launch {
-                CloudinaryModel.uploadImageFromUri(requireContext(), imageUri!!)?.let(uploadSuccess) ?: uploadError("Image upload failed")
+        lifecycleScope.launch {
+            try {
+                when {
+                    imageUri != null -> {
+                        val uploadedUrl = CloudinaryModel.uploadImageFromUri(requireContext(), imageUri!!)
+                        if (uploadedUrl != null) {
+                            onComplete(uploadedUrl)
+                        } else {
+                            onError("Image upload failed")
+                        }
+                    }
+                    imageBitmap != null -> {
+                        CloudinaryModel.uploadImageFromBitmap(
+                            bitmap = imageBitmap!!,
+                            context = requireContext(),
+                            onSuccess = onComplete,
+                            onError = onError
+                        )
+                    }
+                    else -> {
+                        originalImageUrl?.let { onComplete(it) }
+                            ?: onError("לא קיימת תמונה לפוסט")
+                    }
+                }
+            } catch (e: Exception) {
+                onError("Exception: ${e.message}")
             }
-            imageBitmap != null -> CloudinaryModel.uploadImageFromBitmap(imageBitmap!!, requireContext(), onSuccess = uploadSuccess, onError = uploadError)
         }
     }
 
@@ -281,28 +462,31 @@ class UploadPostFragment : Fragment() {
 
         FirebaseFirestore.getInstance().collection("users").document(userId).get()
             .addOnSuccessListener { document ->
-                val username = document.getString("username") ?: "Unknown"
+                if (document != null && document.exists()) {
+                    val post = Post(
+                        postId = document.getString("postId") ?: "",
+                        userId = document.getString("userId") ?: "",
+                        username = document.getString("username") ?: "",
+                        imageUrl = document.getString("imageUrl") ?: "",
+                        caption = document.getString("caption") ?: "",
+                        category = document.getString("category") ?: "",
+                        timestamp = document.getLong("timestamp") ?: System.currentTimeMillis(),
+                        items = (document.get("items") as? List<*>)?.filterIsInstance<String>() ?: emptyList()
+                    )
 
-                val postData = mapOf(
-                    "postId" to postId,
-                    "userId" to userId,
-                    "username" to username,
-                    "imageUrl" to imageUrl,
-                    "caption" to caption,
-                    "category" to category,
-                    "timestamp" to System.currentTimeMillis(),
-                    "items" to items
-                )
+                    binding.captionEditText.setText(post.caption)
+                    loadCategoryIntoChip(post.category)
+                    loadItemsIntoViews(post.items)
+                    Glide.with(this).load(post.imageUrl).into(binding.postImage)
 
-                FirebaseFirestore.getInstance().collection("posts").document(postId)
-                    .set(postData)
-                    .addOnSuccessListener {
-                        savePostToRoom(postId, userId, username, imageUrl, caption, category, items)
-                    }
-                    .addOnFailureListener { error ->
-                        Log.e("FirestoreError", "Failed to save post: ${error.message}")
-                        Toast.makeText(requireContext(), "Failed to save post", Toast.LENGTH_SHORT).show()
-                    }
+                    originalImageUrl = post.imageUrl
+                    editingPostId = post.postId
+
+                    binding.postButton.visibility = View.VISIBLE
+                } else {
+                    Toast.makeText(requireContext(), "הפוסט לא נמצא", Toast.LENGTH_SHORT).show()
+                    findNavController().navigateUp()
+                }
             }
     }
 

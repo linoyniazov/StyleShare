@@ -38,6 +38,12 @@ class ProfileViewModel : ViewModel() {
                 Log.e("ProfileViewModel", "Failed to load user profile", exception)
             }
     }
+    fun deletePost(postId: String) {
+        val currentPosts = _userPosts.value?.toMutableList() ?: return
+        val updatedPosts = currentPosts.filter { it.postId != postId }
+        _userPosts.value = updatedPosts
+    }
+
 
 
     fun loadUserPosts(userId: String) {

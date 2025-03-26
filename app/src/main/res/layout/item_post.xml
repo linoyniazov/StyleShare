@@ -37,7 +37,16 @@
                 android:layout_marginBottom="4dp"
                 tools:text="almog.elimelech" />
 
-            <com.google.android.material.chip.Chip
+            <ImageButton
+                android:id="@+id/btnOptions"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_more_vert"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="options"
+                android:visibility="visible" />
+
+        <com.google.android.material.chip.Chip
                 android:id="@+id/categoryChip"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
