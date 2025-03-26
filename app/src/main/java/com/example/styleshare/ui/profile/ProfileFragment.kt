@@ -22,6 +22,7 @@ import android.widget.Toast
 import android.content.Context
 import androidx.core.content.ContextCompat
 import com.example.styleshare.model.entities.Post
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 
 class ProfileFragment : Fragment() {
@@ -118,7 +119,7 @@ class ProfileFragment : Fragment() {
         navController.navigate(R.id.action_profileFragment_to_uploadPostFragment, bundle)
     }
     private fun handleDeletePost(post: Post) {
-        AlertDialog.Builder(requireContext())
+        val dialog = MaterialAlertDialogBuilder(requireContext())
             .setTitle("Delete Post")
             .setMessage("Are you sure you want to delete this post?")
             .setPositiveButton("Delete") { _, _ ->
@@ -137,8 +138,16 @@ class ProfileFragment : Fragment() {
                     }
             }
             .setNegativeButton("Cancel", null)
-            .show()
+            .create()
+
+        dialog.show()
+
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+            ?.setTextColor(requireContext().getColor(R.color.red))
+        dialog.getButton(AlertDialog.BUTTON_NEGATIVE)
+            ?.setTextColor(requireContext().getColor(R.color.gray))
     }
+
 
 
     private fun loadPostCount() {
