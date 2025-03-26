@@ -21,7 +21,7 @@ import android.app.AlertDialog
 import android.widget.Toast
 import android.content.Context
 import androidx.core.content.ContextCompat
-
+import com.example.styleshare.model.entities.Post
 
 
 class ProfileFragment : Fragment() {
@@ -92,12 +92,54 @@ class ProfileFragment : Fragment() {
 
 
     private fun setupRecyclerView() {
-        postsAdapter = PostsAdapter()
+        postsAdapter = PostsAdapter(
+            onEditClick = { post ->
+                handleEditPost(post)
+            },
+            onDeleteClick = { post ->
+                handleDeletePost(post)
+            }
+        )
+
         binding.categoriesGrid.apply {
             layoutManager = GridLayoutManager(context, 2)
             adapter = postsAdapter
         }
     }
+    private fun handleEditPost(post: Post) {
+        val bundle = Bundle().apply {
+            putString("postId", post.postId)
+            putString("imageUrl", post.imageUrl)
+            putString("caption", post.caption)
+            putString("category", post.category)
+            putStringArrayList("items", ArrayList(post.items))
+        }
+
+        navController.navigate(R.id.action_profileFragment_to_uploadPostFragment, bundle)
+    }
+    private fun handleDeletePost(post: Post) {
+        AlertDialog.Builder(requireContext())
+            .setTitle("Delete Post")
+            .setMessage("Are you sure you want to delete this post?")
+            .setPositiveButton("Delete") { _, _ ->
+                FirebaseFirestore.getInstance()
+                    .collection("posts")
+                    .document(post.postId)
+                    .delete()
+                    .addOnSuccessListener {
+                        profileViewModel.deletePost(post.postId)
+                        Toast.makeText(requireContext(), "Post deleted successfully", Toast.LENGTH_SHORT).show()
+                        loadPostCount()
+                    }
+                    .addOnFailureListener { e ->
+                        Toast.makeText(requireContext(), "Failed to delete post", Toast.LENGTH_SHORT).show()
+                        Log.e("ProfileFragment", "Error deleting post", e)
+                    }
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
 
     private fun loadPostCount() {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return

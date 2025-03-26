@@ -81,7 +81,14 @@
         android:id="@+id/uploadPostFragment"
         android:name="com.example.styleshare.ui.post.UploadPostFragment"
         android:label="Upload Post"
-        tools:layout="@layout/fragment_upload_post" />
+        tools:layout="@layout/fragment_upload_post">
+
+        <argument
+            android:name="postId"
+            app:argType="string"
+            app:nullable="true" />
+
+    </fragment>
 
     <!-- Posts List Screen -->
     <fragment
@@ -128,6 +135,10 @@
         <action
             android:id="@+id/action_profileFragment_to_loginFragment"
             app:destination="@id/loginFragment" />
+        <action
+            android:id="@+id/action_profileFragment_to_uploadPostFragment"
+            app:destination="@id/uploadPostFragment" />
+
 
     </fragment>
 

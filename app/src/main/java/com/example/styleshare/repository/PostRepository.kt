@@ -114,7 +114,17 @@ class PostRepository(private val postDao: PostDao) {
         postDao.deletePost(postId)
     }
 
-    fun getFollowingPosts(followedUserIds: List<String>): LiveData<List<Post>> {
-        return postDao.getPostsByUsers(followedUserIds)
+    suspend fun updatePostInFirestoreOnly(post: Post) {
+        try {
+            FirebaseFirestore.getInstance()
+                .collection("posts")
+                .document(post.postId)
+                .set(post)
+                .await()
+            Log.d("PostRepository", "✅ פוסט עודכן רק ב-Firestore")
+        } catch (e: Exception) {
+            Log.e("PostRepository", "❌ שגיאה בעדכון פוסט: ${e.message}", e)
+        }
     }
+
 }

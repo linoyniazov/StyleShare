@@ -42,7 +42,10 @@ class PostsListFragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
-        postsAdapter = PostsAdapter()
+        postsAdapter = PostsAdapter(
+            onEditClick = { /* אפשר להשאיר ריק או להראות הודעה */ },
+            onDeleteClick = { /* כנ"ל */ }
+        )
         binding.postsRecyclerView.apply {
             adapter = postsAdapter
             layoutManager = LinearLayoutManager(requireContext())
