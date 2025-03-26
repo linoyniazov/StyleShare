@@ -12,7 +12,9 @@ import java.text.SimpleDateFormat
 import java.util.*
 import com.example.styleshare.R
 import android.view.MenuItem
+import android.view.View
 import android.widget.PopupMenu
+import com.google.firebase.auth.FirebaseAuth
 
 class PostsAdapter(
     private val onEditClick: (Post) -> Unit,
@@ -51,13 +53,14 @@ class PostsAdapter(
                 categoryChip.text = post.category
                 captionText.text = post.caption
                 itemsText.text = "Items: ${post.items.joinToString(", ")}"
-
                 val date = Date(post.timestamp)
                 timestampText.text = dateFormat.format(date)
 
-                // כפתור ⋮ לעריכה / מחיקה
-                binding.btnOptions.setOnClickListener {
-                    val popup = PopupMenu(binding.root.context, binding.btnOptions)
+                val currentUserId = FirebaseAuth.getInstance().currentUser?.uid
+                btnOptions.visibility = if (post.userId == currentUserId) View.VISIBLE else View.GONE
+
+                btnOptions.setOnClickListener {
+                    val popup = PopupMenu(binding.root.context, btnOptions)
                     popup.inflate(R.menu.post_options_menu)
                     popup.setOnMenuItemClickListener { item ->
                         when (item.itemId) {
@@ -76,6 +79,7 @@ class PostsAdapter(
                 }
             }
         }
+
     }
 
     private class PostDiffCallback : DiffUtil.ItemCallback<Post>() {
