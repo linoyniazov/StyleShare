@@ -49,6 +49,11 @@ class MainActivity : AppCompatActivity() {
                     navController.navigate(R.id.profileFragment, null, options)
                     true
                 }
+                R.id.navigation_weather -> {
+                    navController.navigate(R.id.navigation_weather, null, options)
+                    true
+                }
+
                 else -> false
             }
         }
