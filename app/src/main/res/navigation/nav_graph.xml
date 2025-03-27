@@ -139,7 +139,6 @@
             android:id="@+id/action_profileFragment_to_uploadPostFragment"
             app:destination="@id/uploadPostFragment" />
 
-
     </fragment>
 
     <!-- Edit Profile Screen -->
@@ -153,5 +152,12 @@
             android:id="@+id/action_editProfileFragment_to_profileFragment"
             app:destination="@id/profileFragment" />
     </fragment>
+    <fragment
+        android:id="@+id/navigation_weather"
+        android:name="com.example.styleshare.ui.weather.WeatherInspirationFragment"
+        android:label="Weather Style"
+        tools:layout="@layout/fragment_weather_inspiration" />
+
+
 
 </navigation>

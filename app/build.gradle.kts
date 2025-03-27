@@ -106,4 +106,10 @@ dependencies {
     implementation(libs.androidx.lifecycle.livedata.ktx)
     implementation (libs.androidx.paging.runtime)
     implementation (libs.circleimageview)
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
+    implementation (libs.androidx.swiperefreshlayout)
+    implementation (libs.play.services.location)
+
+
 }
