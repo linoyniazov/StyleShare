@@ -6,12 +6,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import com.bumptech.glide.Glide
 import com.example.styleshare.adapters.OutfitAdapter
+import com.example.styleshare.api.GeocodingApi
 import com.example.styleshare.api.WeatherApi
 import com.example.styleshare.databinding.FragmentWeatherInspirationBinding
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -29,6 +31,8 @@ class WeatherInspirationFragment : Fragment() {
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private val coroutineScope = CoroutineScope(Dispatchers.Main + Job())
     private lateinit var adapter: OutfitAdapter
+    private lateinit var weatherApi: WeatherApi
+    private lateinit var geocodingApi: GeocodingApi
 
     private val WEATHER_API_KEY = "753dd7ad9d611426a2449815592357f7"
     private val LOCATION_PERMISSION_REQUEST = 1000
@@ -44,13 +48,76 @@ class WeatherInspirationFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.swipeRefreshLayout.setOnRefreshListener {
-            getCurrentLocation()
-        }
 
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
+        setupRetrofit()
+        setupLocationClient()
         setupRecyclerView()
+        setupSearchInput()
+        setupCurrentLocationButton()
         checkLocationPermission()
+    }
+
+    private fun setupRetrofit() {
+        // Create separate Retrofit instances for weather and geocoding APIs
+        val weatherRetrofit = Retrofit.Builder()
+            .baseUrl("https://api.openweathermap.org/data/2.5/")
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+
+        val geocodingRetrofit = Retrofit.Builder()
+            .baseUrl("https://api.openweathermap.org/")
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+
+        weatherApi = weatherRetrofit.create(WeatherApi::class.java)
+        geocodingApi = geocodingRetrofit.create(GeocodingApi::class.java)
+    }
+
+    private fun setupLocationClient() {
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
+    }
+
+    private fun setupSearchInput() {
+        binding.locationSearchInput.setOnEditorActionListener { textView, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                val location = textView.text.toString()
+                if (location.isNotEmpty()) {
+                    searchLocation(location)
+                }
+                true
+            } else {
+                false
+            }
+        }
+    }
+
+    private fun setupCurrentLocationButton() {
+        binding.currentLocationButton.setOnClickListener {
+            checkLocationPermission()
+        }
+    }
+
+    private fun searchLocation(query: String) {
+        binding.progressBar.visibility = View.VISIBLE
+        coroutineScope.launch {
+            try {
+                val locations = geocodingApi.getCoordinates(query, apiKey = WEATHER_API_KEY)
+                if (locations.isNotEmpty()) {
+                    val location = locations.first()
+                    fetchWeather(location.lat, location.lon)
+                } else {
+                    withContext(Dispatchers.Main) {
+                        binding.progressBar.visibility = View.GONE
+                        Toast.makeText(context, "Location not found", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    binding.progressBar.visibility = View.GONE
+                    Toast.makeText(context, "Error searching location: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
     }
 
     private fun setupRecyclerView() {
@@ -97,6 +164,7 @@ class WeatherInspirationFragment : Fragment() {
     }
 
     private fun getCurrentLocation() {
+        binding.progressBar.visibility = View.VISIBLE
         if (ActivityCompat.checkSelfPermission(
                 requireContext(),
                 Manifest.permission.ACCESS_FINE_LOCATION
@@ -108,41 +176,35 @@ class WeatherInspirationFragment : Fragment() {
                         fetchWeather(it.latitude, it.longitude)
                     }
                 }
+                .addOnFailureListener {
+                    binding.progressBar.visibility = View.GONE
+                    Toast.makeText(context, "Error getting location", Toast.LENGTH_SHORT).show()
+                }
         }
     }
 
     private fun fetchWeather(lat: Double, lon: Double) {
-        val retrofit = Retrofit.Builder()
-            .baseUrl("https://api.openweathermap.org/data/2.5/")
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-
-        val weatherApi = retrofit.create(WeatherApi::class.java)
-
         coroutineScope.launch {
             try {
                 val response = weatherApi.getWeather(lat, lon, apiKey = WEATHER_API_KEY)
 
-                // Update UI with weather info
                 binding.apply {
                     locationText.text = response.name
                     temperatureText.text = "${response.main.temp.roundToInt()}°C"
 
                     val weather = response.weather.firstOrNull()
                     val weatherMain = weather?.main?.lowercase() ?: ""
-                    val weatherDesc = weather?.description?.capitalize() ?: ""
 
-                    // Enhanced weather description
                     val timeOfDay = if (weather?.icon?.endsWith("d") == true) "day" else "night"
                     weatherDescription.text = getEnhancedWeatherDescription(weatherMain, timeOfDay)
 
-                    // Custom weather icon URL based on condition
-                    val iconUrl = getCustomWeatherIconUrl(weatherMain, timeOfDay)
+                    // Use weather condition icon from OpenWeatherMap directly
+                    val iconCode = weather?.icon ?: "01d"
+                    val iconUrl = "https://openweathermap.org/img/wn/$iconCode@2x.png"
                     Glide.with(requireContext())
                         .load(iconUrl)
                         .into(weatherIcon)
 
-                    // Enhanced outfit suggestions based on weather and temperature
                     outfitSuggestionText.text = when {
                         weatherMain == "rain" -> "Time for Rain-Ready Outfits ☔"
                         weatherMain == "snow" -> "Bundle Up in Winter Warmth ❄️"
@@ -154,20 +216,17 @@ class WeatherInspirationFragment : Fragment() {
                         else -> "Cozy Winter Fashion ❄️"
                     }
 
-                    // Load appropriate outfits based on temperature and weather
                     loadOutfitsForWeather(response.main.temp, weatherMain)
                 }
-
-                // End the swipe refresh animation
-                binding.swipeRefreshLayout.isRefreshing = false
-
+                binding.progressBar.visibility = View.GONE
             } catch (e: Exception) {
-                Toast.makeText(context, "Error fetching weather data", Toast.LENGTH_SHORT).show()
-                binding.swipeRefreshLayout.isRefreshing = false // Stop the refresh animation on error
+                withContext(Dispatchers.Main) {
+                    binding.progressBar.visibility = View.GONE
+                    Toast.makeText(context, "Error fetching weather data", Toast.LENGTH_SHORT).show()
+                }
             }
         }
     }
-
 
     private fun getEnhancedWeatherDescription(weatherMain: String, timeOfDay: String): String {
         return when (weatherMain) {
@@ -178,21 +237,7 @@ class WeatherInspirationFragment : Fragment() {
             "thunderstorm" -> "Thunderstorms ⛈️"
             "drizzle" -> "Light Rain 🌧️"
             "mist", "fog" -> "Misty Conditions 🌫️"
-            else -> "Weather Unknown"
-        }
-    }
-
-    private fun getCustomWeatherIconUrl(weatherMain: String, timeOfDay: String): String {
-        val baseUrl = "https://cdn.weatherapi.com/weather/128x128"
-        return when (weatherMain) {
-            "clear" -> if (timeOfDay == "day") "$baseUrl/day/113.png" else "$baseUrl/night/113.png"
-            "clouds" -> if (timeOfDay == "day") "$baseUrl/day/116.png" else "$baseUrl/night/116.png"
-            "rain" -> "$baseUrl/day/308.png"
-            "snow" -> "$baseUrl/day/332.png"
-            "thunderstorm" -> "$baseUrl/day/389.png"
-            "drizzle" -> "$baseUrl/day/266.png"
-            "mist", "fog" -> "$baseUrl/day/248.png"
-            else -> "$baseUrl/day/113.png"
+            else -> weatherMain.capitalize()
         }
     }
 
@@ -213,11 +258,9 @@ class WeatherInspirationFragment : Fragment() {
         val baseUrl = "https://res.cloudinary.com/$cloudName/image/upload/${baseFolder.replace(" ", "%20")}/$outfitFolder"
 
         val outfits = mutableListOf<String>()
-
         for (i in 1..6) {
             outfits.add("$baseUrl/look$i.jpg")
         }
-
         adapter.submitList(outfits)
     }
 

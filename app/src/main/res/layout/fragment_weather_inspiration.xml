@@ -27,6 +27,52 @@
                 android:textSize="24sp"
                 android:textStyle="bold" />
 
+            <!-- Location Search -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="2dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:padding="8dp">
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginStart="8dp"
+                        android:src="@drawable/ic_search"
+                        app:tint="@color/gray" />
+
+                    <EditText
+                        android:id="@+id/locationSearchInput"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="8dp"
+                        android:background="@null"
+                        android:hint="Search location"
+                        android:imeOptions="actionSearch"
+                        android:inputType="text"
+                        android:padding="8dp"
+                        android:textSize="16sp" />
+
+                    <ImageButton
+                        android:id="@+id/currentLocationButton"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:src="@drawable/ic_my_location"
+                        app:tint="@color/gray" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Weather Card -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -95,20 +141,13 @@
         </LinearLayout>
     </com.google.android.material.appbar.AppBarLayout>
 
-    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-        android:id="@+id/swipeRefreshLayout"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/outfitsRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/outfitsRecyclerView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:clipToPadding="false"
-            android:padding="8dp" />
-    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
-
+        android:clipToPadding="false"
+        android:padding="8dp"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
     <ProgressBar
         android:id="@+id/progressBar"
