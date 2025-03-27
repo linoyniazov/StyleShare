@@ -8,6 +8,7 @@ import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.example.styleshare.databinding.ActivityMainBinding
+import com.google.firebase.auth.FirebaseAuth
 
 class MainActivity : AppCompatActivity() {
 
@@ -17,19 +18,25 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // חיבור ל־View Binding
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // הגדרת ה־NavController מתוך ה־NavHostFragment
         val navHostFragment = supportFragmentManager
             .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         navController = navHostFragment.navController
 
-        // חיבור ה־BottomNavigation ל־NavController
+        val firebaseAuth = FirebaseAuth.getInstance()
+        val currentUser = firebaseAuth.currentUser
+        if (currentUser != null) {
+            // אם יש משתמש מחובר, תנווט לעמוד הבית
+            navController.navigate(R.id.homeFragment)
+        } else {
+            // אם אין משתמש מחובר, תנווט לעמוד login
+            navController.navigate(R.id.welcomeFragment)
+        }
+
         binding.bottomNavigation.setupWithNavController(navController)
 
-        // ניווט מותאם אישית עם popUpTo ומניעת חזרתיות
         binding.bottomNavigation.setOnItemSelectedListener { item ->
             val options = NavOptions.Builder()
                 .setLaunchSingleTop(true)
@@ -58,7 +65,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        // הסתרת ה־BottomNavigation במסכים מסוימים (למשל Login/Register)
         navController.addOnDestinationChangedListener { _, destination, _ ->
             val hiddenScreens = setOf(
                 R.id.welcomeFragment,
@@ -69,5 +75,12 @@ class MainActivity : AppCompatActivity() {
             binding.bottomNavigation.visibility =
                 if (destination.id in hiddenScreens) View.GONE else View.VISIBLE
         }
+    }
+
+    // פונקציה לביצוע logout
+    private fun logoutUser() {
+        val firebaseAuth = FirebaseAuth.getInstance()
+        firebaseAuth.signOut()  // יציאה מהמערכת
+        navController.navigate(R.id.welcomeFragment)  // ניווט לעמוד Welcome
     }
 }
