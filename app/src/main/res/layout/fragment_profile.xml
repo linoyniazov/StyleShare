@@ -5,6 +5,10 @@
     android:layout_height="match_parent"
     android:background="@color/background">
 
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefresh"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -41,7 +45,7 @@
                             android:layout_alignParentEnd="true"
                             android:background="?attr/selectableItemBackgroundBorderless"
                             android:src="@drawable/ic_logout"
-                            android:color="@color/black"
+                            app:tint="@color/black"
                             android:contentDescription="Logout" />
                     </RelativeLayout>
 
@@ -120,7 +124,7 @@
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
-            <!-- Photo Categories Grid -->
+            <!-- Categories Grid -->
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/categoriesGrid"
                 android:layout_width="match_parent"
@@ -131,5 +135,6 @@
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

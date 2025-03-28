@@ -234,12 +234,14 @@ class UploadPostFragment : Fragment() {
         FirebaseFirestore.getInstance().collection("users").document(userId).get()
             .addOnSuccessListener { document ->
                 val username = document.getString("username") ?: "Unknown"
+                val userProfileImageUrl = document.getString("profileImageUrl") ?: ""
 
                 val post = hashMapOf(
                     "postId" to postId,
                     "userId" to userId,
                     "username" to username,
                     "imageUrl" to imageUrl,
+                    "userProfileImageUrl" to userProfileImageUrl,
                     "caption" to caption,
                     "category" to category,
                     "timestamp" to System.currentTimeMillis(),
@@ -249,15 +251,24 @@ class UploadPostFragment : Fragment() {
                 FirebaseFirestore.getInstance().collection("posts").document(postId)
                     .set(post)
                     .addOnSuccessListener {
-                        Toast.makeText(requireContext(), "Post uploaded successfully!", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            requireContext(),
+                            "Post uploaded successfully!",
+                            Toast.LENGTH_SHORT
+                        ).show()
                         findNavController().navigateUp()
                     }
                     .addOnFailureListener { e ->
-                        Toast.makeText(requireContext(), "Error saving post: ${e.message}", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            requireContext(),
+                            "Error saving post: ${e.message}",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
             }
             .addOnFailureListener {
-                Toast.makeText(requireContext(), "Error fetching user data", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "Error fetching user data", Toast.LENGTH_SHORT)
+                    .show()
             }
     }
 
@@ -267,12 +278,14 @@ class UploadPostFragment : Fragment() {
         FirebaseFirestore.getInstance().collection("users").document(userId).get()
             .addOnSuccessListener { document ->
                 val username = document.getString("username") ?: "Unknown"
+                val userProfileImageUrl = document.getString("profileImageUrl") ?: ""
 
                 val updatedPost = hashMapOf(
                     "postId" to postId,
                     "userId" to userId,
                     "username" to username,
                     "imageUrl" to imageUrl,
+                    "userProfileImageUrl" to userProfileImageUrl,
                     "caption" to caption,
                     "category" to category,
                     "timestamp" to System.currentTimeMillis(),

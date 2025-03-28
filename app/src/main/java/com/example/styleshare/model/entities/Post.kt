@@ -1,12 +1,15 @@
 package com.example.styleshare.model.entities
 
+import android.os.Parcelable
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
 import com.example.styleshare.utils.Converters
+import kotlinx.parcelize.Parcelize
 
+@Parcelize
 @Entity(
     tableName = "posts",
     foreignKeys = [
@@ -23,7 +26,7 @@ import com.example.styleshare.utils.Converters
 data class Post(
     @PrimaryKey val postId: String = "",
     val userId: String = "",
-    val username: String = "", // ✅ חדש
+    val username: String = "",
     val imageUrl: String = "",
     val caption: String = "",
     val category: String = "",
@@ -34,22 +37,4 @@ data class Post(
     val editedTimestamp: Long? = null,
     val isDraft: Boolean = false,
     val items: List<String> = emptyList()
-) {
-    constructor() : this(
-        postId = "",
-        userId = "",
-        username = "", // ✅ גם כאן
-        imageUrl = "",
-        caption = "",
-        category = "",
-        timestamp = 0L,
-        imageWidth = null,
-        imageHeight = null,
-        edited = false,
-        editedTimestamp = null,
-        isDraft = false,
-        items = emptyList()
-    )
-}
-
-
+) : Parcelable

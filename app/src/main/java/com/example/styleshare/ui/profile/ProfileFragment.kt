@@ -13,25 +13,20 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.bumptech.glide.Glide
 import com.example.styleshare.databinding.FragmentProfileBinding
 import com.example.styleshare.viewmodel.ProfileViewModel
-import com.example.styleshare.adapters.PostsAdapter
+import com.example.styleshare.adapters.CategoryGridAdapter
 import com.google.firebase.auth.FirebaseAuth
 import com.example.styleshare.R
 import com.google.firebase.firestore.FirebaseFirestore
-import android.app.AlertDialog
 import android.widget.Toast
 import android.content.Context
-import androidx.core.content.ContextCompat
-import com.example.styleshare.model.entities.Post
+import com.example.styleshare.model.CategoryWithPosts
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
-
 class ProfileFragment : Fragment() {
-
     private var _binding: FragmentProfileBinding? = null
     private val binding get() = _binding!!
-
     private val profileViewModel: ProfileViewModel by viewModels()
-    private lateinit var postsAdapter: PostsAdapter
+    private lateinit var categoryAdapter: CategoryGridAdapter
     private lateinit var navController: NavController
 
     override fun onCreateView(
@@ -45,13 +40,19 @@ class ProfileFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         navController = findNavController()
-
         setupRecyclerView()
         setupListeners()
+        setupSwipeRefresh()
         loadUserData()
         loadPostCount()
+    }
+
+    private fun setupSwipeRefresh() {
+        binding.swipeRefresh.setOnRefreshListener {
+            loadUserData()
+            loadPostCount()
+        }
     }
 
     private fun setupListeners() {
@@ -63,92 +64,40 @@ class ProfileFragment : Fragment() {
             logout()
         }
     }
+
     private fun logout() {
-        val dialog = AlertDialog.Builder(requireContext())
+        val dialog = MaterialAlertDialogBuilder(requireContext())
             .setTitle("Logout")
             .setMessage("Are you sure you want to log out?")
             .setPositiveButton("Yes") { _, _ ->
                 FirebaseAuth.getInstance().signOut()
-
                 requireActivity().getSharedPreferences("StyleShare", Context.MODE_PRIVATE)
                     .edit()
                     .clear()
                     .apply()
-
                 Toast.makeText(requireContext(), "You have been logged out", Toast.LENGTH_SHORT).show()
-
                 navController.navigate(R.id.action_profileFragment_to_loginFragment)
                 navController.popBackStack(R.id.loginFragment, false)
-            }
-            .setNegativeButton("Cancel", null)
-            .create() // שימי לב: משתמשים ב־create במקום show
-
-        dialog.show()
-
-        dialog.getButton(AlertDialog.BUTTON_POSITIVE)
-            ?.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
-        dialog.getButton(AlertDialog.BUTTON_NEGATIVE)
-            ?.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
-    }
-
-
-    private fun setupRecyclerView() {
-        postsAdapter = PostsAdapter(
-            onEditClick = { post ->
-                handleEditPost(post)
-            },
-            onDeleteClick = { post ->
-                handleDeletePost(post)
-            }
-        )
-
-        binding.categoriesGrid.apply {
-            layoutManager = GridLayoutManager(context, 2)
-            adapter = postsAdapter
-        }
-    }
-    private fun handleEditPost(post: Post) {
-        val bundle = Bundle().apply {
-            putString("postId", post.postId)
-            putString("imageUrl", post.imageUrl)
-            putString("caption", post.caption)
-            putString("category", post.category)
-            putStringArrayList("items", ArrayList(post.items))
-        }
-
-        navController.navigate(R.id.action_profileFragment_to_uploadPostFragment, bundle)
-    }
-    private fun handleDeletePost(post: Post) {
-        val dialog = MaterialAlertDialogBuilder(requireContext())
-            .setTitle("Delete Post")
-            .setMessage("Are you sure you want to delete this post?")
-            .setPositiveButton("Delete") { _, _ ->
-                FirebaseFirestore.getInstance()
-                    .collection("posts")
-                    .document(post.postId)
-                    .delete()
-                    .addOnSuccessListener {
-                        profileViewModel.deletePost(post.postId)
-                        Toast.makeText(requireContext(), "Post deleted successfully", Toast.LENGTH_SHORT).show()
-                        loadPostCount()
-                    }
-                    .addOnFailureListener { e ->
-                        Toast.makeText(requireContext(), "Failed to delete post", Toast.LENGTH_SHORT).show()
-                        Log.e("ProfileFragment", "Error deleting post", e)
-                    }
             }
             .setNegativeButton("Cancel", null)
             .create()
 
         dialog.show()
 
-        dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+        dialog.getButton(android.app.AlertDialog.BUTTON_POSITIVE)
             ?.setTextColor(requireContext().getColor(R.color.red))
-        dialog.getButton(AlertDialog.BUTTON_NEGATIVE)
+
+        dialog.getButton(android.app.AlertDialog.BUTTON_NEGATIVE)
             ?.setTextColor(requireContext().getColor(R.color.gray))
     }
 
-
+    private fun setupRecyclerView() {
+        categoryAdapter = CategoryGridAdapter(childFragmentManager)
+        binding.categoriesGrid.apply {
+            layoutManager = GridLayoutManager(context, 2)
+            adapter = categoryAdapter
+        }
+    }
 
     private fun loadPostCount() {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
@@ -158,16 +107,17 @@ class ProfileFragment : Fragment() {
             .addOnSuccessListener { documents ->
                 if (isAdded) {
                     binding.postCount.text = documents.size().toString()
+                    binding.swipeRefresh.isRefreshing = false
                 }
             }
             .addOnFailureListener { e ->
                 Log.e("ProfileFragment", "Error fetching post count", e)
+                binding.swipeRefresh.isRefreshing = false
             }
     }
 
     private fun loadUserData() {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
-
         profileViewModel.loadUserProfile(userId)
         profileViewModel.loadUserPosts(userId)
 
@@ -189,7 +139,13 @@ class ProfileFragment : Fragment() {
             }
 
             profileViewModel.userPosts.observe(lifecycleOwner) { posts ->
-                postsAdapter.submitList(posts)
+                // Group posts by category
+                val categorizedPosts = posts.groupBy { it.category }
+                    .map { (category, posts) ->
+                        CategoryWithPosts(category, posts)
+                    }
+                categoryAdapter.submitList(categorizedPosts)
+                binding.swipeRefresh.isRefreshing = false
             }
         }
     }

@@ -4,25 +4,23 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.styleshare.databinding.FragmentHomeBinding
-import com.example.styleshare.viewmodel.PostViewModel
+import com.example.styleshare.R
 import com.example.styleshare.adapters.PostsAdapter
+import com.example.styleshare.databinding.FragmentHomeBinding
 import com.example.styleshare.model.AppDatabase
 import com.example.styleshare.repository.PostRepository
-import com.example.styleshare.R
-import com.google.firebase.firestore.FirebaseFirestore
+import com.example.styleshare.viewmodel.PostViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import android.widget.Toast
-import com.example.styleshare.model.entities.Post
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.Query
+import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.launch
 
 class HomeFragment : Fragment() {
-
 
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
@@ -49,8 +47,47 @@ class HomeFragment : Fragment() {
 
         setupRecyclerView()
         showLoading(true)
-        observePostsFromFirestore()
+
+        lifecycleScope.launch {
+            try {
+                postViewModel.syncPostsFromFirestore()
+            } catch (e: Exception) {
+                e.printStackTrace()
+                Toast.makeText(requireContext(), "Sync failed", Toast.LENGTH_SHORT).show()
+            } finally {
+                showLoading(false)
+                binding.swipeRefresh.isRefreshing = false
+            }
+        }
+
+        // ✅ רענון על ידי המשתמש עם טיפול בשגיאות
+        binding.swipeRefresh.setOnRefreshListener {
+            lifecycleScope.launch {
+                try {
+                    postViewModel.syncPostsFromFirestore()
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    Toast.makeText(requireContext(), "Sync failed", Toast.LENGTH_SHORT).show()
+                } finally {
+                    binding.swipeRefresh.isRefreshing = false
+                }
+            }
+        }
+
+        // ✅ מאזין לשינויים מה-ViewModel
+        postViewModel.getAllPostsFromFirestore().observe(viewLifecycleOwner) { posts ->
+            postAdapter.submitList(posts)
+
+            if (posts.isEmpty()) {
+                binding.recyclerView.visibility = View.GONE
+                binding.noPostsText.visibility = View.VISIBLE
+            } else {
+                binding.recyclerView.visibility = View.VISIBLE
+                binding.noPostsText.visibility = View.GONE
+            }
+        }
     }
+
 
     private fun setupRecyclerView() {
         postAdapter = PostsAdapter(
@@ -75,6 +112,11 @@ class HomeFragment : Fragment() {
                             .addOnFailureListener {
                                 Toast.makeText(requireContext(), "Failed to delete post", Toast.LENGTH_SHORT).show()
                             }
+
+                        // ✅ גם מחיקה מ-ROOM
+                        lifecycleScope.launch {
+                            postViewModel.deletePost(post.postId)
+                        }
                     }
                     .setNegativeButton("Cancel", null)
                     .create()
@@ -87,52 +129,12 @@ class HomeFragment : Fragment() {
                 dialog.getButton(android.app.AlertDialog.BUTTON_NEGATIVE)
                     ?.setTextColor(requireContext().getColor(R.color.gray))
             }
-
         )
 
         binding.recyclerView.apply {
             adapter = postAdapter
             layoutManager = LinearLayoutManager(requireContext())
             setHasFixedSize(true)
-        }
-    }
-
-    private fun loadPosts() {
-        showLoading(true) // ← הוסיפי את זה כאן
-
-        val currentUserId = FirebaseAuth.getInstance().currentUser?.uid ?: return
-
-        FirebaseFirestore.getInstance().collection("posts")
-            .orderBy("timestamp", Query.Direction.DESCENDING)
-            .get()
-            .addOnSuccessListener { result ->
-                val posts = result.documents.mapNotNull { doc ->
-                    doc.toObject(Post::class.java)
-                }
-                postAdapter.submitList(posts)
-                showLoading(false) // ← סיום טעינה כאן
-            }
-            .addOnFailureListener {
-                Toast.makeText(requireContext(), "Failed to load posts", Toast.LENGTH_SHORT).show()
-                showLoading(false) // ← גם במקרה של כישלון
-            }
-    }
-
-
-    private fun observePostsFromFirestore() {
-        showLoading(true) // ← הוסיפי שורה זו בתחילת הפונקציה
-
-        postViewModel.getAllPostsFromFirestore().observe(viewLifecycleOwner) { posts ->
-            postAdapter.submitList(posts)
-            showLoading(false)
-
-            if (posts.isEmpty()) {
-                binding.recyclerView.visibility = View.GONE
-                binding.noPostsText.visibility = View.VISIBLE
-            } else {
-                binding.recyclerView.visibility = View.VISIBLE
-                binding.noPostsText.visibility = View.GONE
-            }
         }
     }
 
