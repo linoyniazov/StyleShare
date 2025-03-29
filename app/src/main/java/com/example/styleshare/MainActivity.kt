@@ -48,14 +48,17 @@ class MainActivity : AppCompatActivity() {
                     navController.navigate(R.id.homeFragment, null, options)
                     true
                 }
+
                 R.id.uploadPostFragment -> {
                     navController.navigate(R.id.uploadPostFragment, null, options)
                     true
                 }
+
                 R.id.profileFragment -> {
                     navController.navigate(R.id.profileFragment, null, options)
                     true
                 }
+
                 R.id.navigation_weather -> {
                     navController.navigate(R.id.navigation_weather, null, options)
                     true
@@ -70,14 +73,17 @@ class MainActivity : AppCompatActivity() {
                 R.id.welcomeFragment,
                 R.id.loginFragment,
                 R.id.registerEmailFragment,
-                R.id.registerPasswordFragment
+                R.id.registerPasswordFragment,
+                R.id.uploadPostFragment,  // הוספת UploadPostFragment לרשימה
+                R.id.editProfileFragment      // הוספת ProfileFragment לרשימה
             )
             binding.bottomNavigation.visibility =
                 if (destination.id in hiddenScreens) View.GONE else View.VISIBLE
         }
     }
 
-    // פונקציה לביצוע logout
+
+        // פונקציה לביצוע logout
     private fun logoutUser() {
         val firebaseAuth = FirebaseAuth.getInstance()
         firebaseAuth.signOut()  // יציאה מהמערכת

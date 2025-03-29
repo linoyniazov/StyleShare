@@ -9,132 +9,132 @@
         android:id="@+id/swipeRefresh"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-    <androidx.core.widget.NestedScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <LinearLayout
+        <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:layout_height="match_parent">
 
-            <!-- Profile Header -->
-            <androidx.cardview.widget.CardView
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="16dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="4dp">
+                android:orientation="vertical">
 
-                <LinearLayout
+                <!-- Profile Header -->
+                <androidx.cardview.widget.CardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
+                    android:layout_margin="16dp"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="4dp">
 
-                    <!-- Top Bar with Logout -->
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="16dp">
-
-                        <ImageButton
-                            android:id="@+id/btnLogout"
-                            android:layout_width="48dp"
-                            android:layout_height="48dp"
-                            android:layout_alignParentEnd="true"
-                            android:background="?attr/selectableItemBackgroundBorderless"
-                            android:src="@drawable/ic_logout"
-                            app:tint="@color/black"
-                            android:contentDescription="Logout" />
-                    </RelativeLayout>
-
-                    <!-- Profile Picture -->
-                    <de.hdodenhof.circleimageview.CircleImageView
-                        android:id="@+id/profileImage"
-                        android:layout_width="100dp"
-                        android:layout_height="100dp"
-                        android:layout_gravity="center_horizontal"
-                        android:src="@drawable/default_profile" />
-
-                    <!-- Stats -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
-                        android:gravity="center"
-                        android:orientation="horizontal">
+                        android:orientation="vertical"
+                        android:padding="16dp">
 
-                        <!-- Post Count -->
+                        <!-- Top Bar with Logout -->
+                        <RelativeLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="16dp">
+
+                            <ImageButton
+                                android:id="@+id/btnLogout"
+                                android:layout_width="48dp"
+                                android:layout_height="48dp"
+                                android:layout_alignParentEnd="true"
+                                android:background="?attr/selectableItemBackgroundBorderless"
+                                android:src="@drawable/ic_logout"
+                                app:tint="@color/black"
+                                android:contentDescription="Logout" />
+                        </RelativeLayout>
+
+                        <!-- Profile Picture -->
+                        <de.hdodenhof.circleimageview.CircleImageView
+                            android:id="@+id/profileImage"
+                            android:layout_width="100dp"
+                            android:layout_height="100dp"
+                            android:layout_gravity="center_horizontal"
+                            android:src="@drawable/default_profile" />
+
+                        <!-- Stats -->
                         <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="16dp"
+                            android:gravity="center"
+                            android:orientation="horizontal">
+
+                            <!-- Post Count -->
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:gravity="center"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:id="@+id/postCount"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="0"
+                                    android:textSize="16sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Posts"
+                                    android:textSize="14sp" />
+                            </LinearLayout>
+                        </LinearLayout>
+
+                        <!-- Username -->
+                        <TextView
+                            android:id="@+id/username"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginTop="16dp"
+                            android:text="\@Username"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+
+                        <!-- Bio -->
+                        <TextView
+                            android:id="@+id/userBio"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
                             android:gravity="center"
-                            android:orientation="vertical">
+                            android:text="Fashion enthusiast exploring the art of styling. Discover my favorite looks and get inspired! ✨ #OOTD #StyleInspo"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="14sp" />
 
-                            <TextView
-                                android:id="@+id/postCount"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="0"
-                                android:textSize="16sp"
-                                android:textStyle="bold" />
+                        <!-- Edit Profile Button -->
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnEditProfile"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginTop="16dp"
+                            android:text="Edit profile"
+                            android:textColor="@color/black"
+                            app:cornerRadius="20dp" />
 
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Posts"
-                                android:textSize="14sp" />
-                        </LinearLayout>
                     </LinearLayout>
+                </androidx.cardview.widget.CardView>
 
-                    <!-- Username -->
-                    <TextView
-                        android:id="@+id/username"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:layout_marginTop="16dp"
-                        android:text="\@Username"
-                        android:textSize="16sp"
-                        android:textStyle="bold" />
+                <!-- Categories Grid -->
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/categoriesGrid"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="8dp"
+                    android:clipToPadding="false"
+                    android:padding="8dp" />
 
-                    <!-- Bio -->
-                    <TextView
-                        android:id="@+id/userBio"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:gravity="center"
-                        android:text="Fashion enthusiast exploring the art of styling. Discover my favorite looks and get inspired! ✨ #OOTD #StyleInspo"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="14sp" />
-
-                    <!-- Edit Profile Button -->
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnEditProfile"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:layout_marginTop="16dp"
-                        android:text="Edit profile"
-                        android:textColor="@color/black"
-                        app:cornerRadius="20dp" />
-
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-
-            <!-- Categories Grid -->
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/categoriesGrid"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="8dp"
-                android:clipToPadding="false"
-                android:padding="8dp" />
-
-        </LinearLayout>
-    </androidx.core.widget.NestedScrollView>
+            </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
