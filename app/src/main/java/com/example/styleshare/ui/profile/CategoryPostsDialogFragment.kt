@@ -72,7 +72,7 @@ class CategoryPostsDialogFragment : DialogFragment() {
     }
 
     private fun showDeleteConfirmationDialog(post: Post) {
-        MaterialAlertDialogBuilder(requireContext())
+        val dialog = MaterialAlertDialogBuilder(requireContext())
             .setTitle("Delete Post")
             .setMessage("Are you sure you want to delete this post?")
             .setPositiveButton("Delete") { _, _ ->
@@ -80,7 +80,15 @@ class CategoryPostsDialogFragment : DialogFragment() {
             }
             .setNegativeButton("Cancel", null)
             .show()
+
+        // הוספת הצבעים לכפתורים
+        dialog.getButton(android.app.AlertDialog.BUTTON_POSITIVE)
+            ?.setTextColor(requireContext().getColor(R.color.red))
+
+        dialog.getButton(android.app.AlertDialog.BUTTON_NEGATIVE)
+            ?.setTextColor(requireContext().getColor(R.color.gray))
     }
+
 
     private fun deletePost(post: Post) {
         FirebaseFirestore.getInstance()
