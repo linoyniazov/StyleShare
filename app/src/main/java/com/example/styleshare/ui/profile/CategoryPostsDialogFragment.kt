@@ -14,23 +14,11 @@ import com.google.firebase.firestore.FirebaseFirestore
 import android.widget.Toast
 import androidx.navigation.fragment.findNavController
 import com.example.styleshare.R
-import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
-import com.example.styleshare.model.AppDatabase
-import com.example.styleshare.repository.PostRepository
-import com.example.styleshare.viewmodel.PostViewModel
-import kotlinx.coroutines.launch
 
 class CategoryPostsDialogFragment : DialogFragment() {
     private var _binding: FragmentCategoryPostsDialogBinding? = null
     private val binding get() = _binding!!
     private lateinit var postsAdapter: PostsAdapter
-
-    private val postViewModel: PostViewModel by viewModels {
-        PostViewModel.PostViewModelFactory(
-            PostRepository(AppDatabase.getDatabase(requireContext()).postDao())
-        )
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,8 +33,8 @@ class CategoryPostsDialogFragment : DialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val categoryName = arguments?.getString(ARG_CATEGORY_NAME) ?: ""
-        val posts = arguments?.getParcelableArrayList<Post>(ARG_POSTS)?.toList() ?: emptyList()
+        val categoryName = arguments?.getString("categoryName") ?: ""
+        val posts = arguments?.getParcelableArrayList<Post>("posts") ?: arrayListOf()
 
         setupToolbar(categoryName)
         setupRecyclerView(posts)
@@ -84,39 +72,28 @@ class CategoryPostsDialogFragment : DialogFragment() {
     }
 
     private fun showDeleteConfirmationDialog(post: Post) {
-        val dialog = MaterialAlertDialogBuilder(requireContext())
+        MaterialAlertDialogBuilder(requireContext())
             .setTitle("Delete Post")
             .setMessage("Are you sure you want to delete this post?")
             .setPositiveButton("Delete") { _, _ ->
-                FirebaseFirestore.getInstance()
-                    .collection("posts")
-                    .document(post.postId)
-                    .delete()
-                    .addOnSuccessListener {
-                        Toast.makeText(requireContext(), "Post deleted", Toast.LENGTH_SHORT).show()
-
-                        // Delete from Room database
-                        lifecycleScope.launch {
-                            postViewModel.deletePost(post.postId)
-                        }
-
-                        dismiss()
-                    }
-                    .addOnFailureListener {
-                        Toast.makeText(requireContext(), "Failed to delete post", Toast.LENGTH_SHORT).show()
-                    }
+                deletePost(post)
             }
             .setNegativeButton("Cancel", null)
-            .create()
+            .show()
+    }
 
-        dialog.show()
-
-        // Style the dialog buttons
-        dialog.getButton(android.app.AlertDialog.BUTTON_POSITIVE)
-            ?.setTextColor(requireContext().getColor(R.color.red))
-
-        dialog.getButton(android.app.AlertDialog.BUTTON_NEGATIVE)
-            ?.setTextColor(requireContext().getColor(R.color.gray))
+    private fun deletePost(post: Post) {
+        FirebaseFirestore.getInstance()
+            .collection("posts")
+            .document(post.postId)
+            .delete()
+            .addOnSuccessListener {
+                Toast.makeText(context, "Post deleted successfully", Toast.LENGTH_SHORT).show()
+                dismiss()
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(context, "Failed to delete post: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
     }
 
     override fun onDestroyView() {
@@ -125,14 +102,11 @@ class CategoryPostsDialogFragment : DialogFragment() {
     }
 
     companion object {
-        private const val ARG_CATEGORY_NAME = "categoryName"
-        private const val ARG_POSTS = "posts"
-
         fun newInstance(categoryName: String, posts: List<Post>): CategoryPostsDialogFragment {
             return CategoryPostsDialogFragment().apply {
                 arguments = Bundle().apply {
-                    putString(ARG_CATEGORY_NAME, categoryName)
-                    putParcelableArrayList(ARG_POSTS, ArrayList(posts))
+                    putString("categoryName", categoryName)
+                    putParcelableArrayList("posts", ArrayList(posts))
                 }
             }
         }

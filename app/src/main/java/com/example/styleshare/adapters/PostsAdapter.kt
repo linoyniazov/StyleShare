@@ -11,7 +11,6 @@ import com.example.styleshare.model.entities.Post
 import java.text.SimpleDateFormat
 import java.util.*
 import com.example.styleshare.R
-import android.view.MenuItem
 import android.view.View
 import android.widget.PopupMenu
 import com.google.firebase.auth.FirebaseAuth
@@ -52,7 +51,11 @@ class PostsAdapter(
                 usernameText.text = post.username
                 categoryChip.text = post.category
                 captionText.text = post.caption
-                itemsText.text = "Items: ${post.items.joinToString(", ")}"
+
+                // Format items with new style
+                val formattedItems = formatItems(post.items)
+                itemsText.text = formattedItems
+
                 val date = Date(post.timestamp)
                 timestampText.text = dateFormat.format(date)
 
@@ -80,6 +83,21 @@ class PostsAdapter(
             }
         }
 
+        private fun formatItems(items: List<String>): String {
+            if (items.isEmpty()) return ""
+
+            val formattedItems = items.map { item ->
+                val parts = item.split(" - ")
+                if (parts.size == 3) {
+                    val (name, brand, price) = parts
+                    "$name: $brand • $price₪"
+                } else {
+                    item
+                }
+            }
+
+            return formattedItems.joinToString("\n")
+        }
     }
 
     private class PostDiffCallback : DiffUtil.ItemCallback<Post>() {
